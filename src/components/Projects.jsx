@@ -9,6 +9,8 @@ const projects = [
         github: "https://github.com/auroraaviz/turistea-agencia-viajes",
         demo: null, tag: "Proyecto estrella",
         x: 15, y: 22, starX: 18, starY: 22,
+        // Posición en el canvas móvil (%) — distribuidas para que no se solapen
+        mobileStarX: 28, mobileStarY: 16,
         cloud: { w: 280, h: 160,
             blobs: [
                 { l:"3%",  t:"28%",  w:"90%", h:"60%", blur:18 },
@@ -27,6 +29,7 @@ const projects = [
         demo: "https://auroraaviz.github.io/superverde_SupermercadoVegano/",
         tag: "Diseño propio",
         x: 58, y: 15, starX: 55, starY: 18,
+        mobileStarX: 72, mobileStarY: 11,
         cloud: { w: 300, h: 120,
             blobs: [
                 { l:"2%",  t:"32%",  w:"94%", h:"58%", blur:18 },
@@ -45,6 +48,7 @@ const projects = [
         demo: "https://auroraaviz.github.io/DavanteDent---Gesti-n-de-citas/",
         tag: "Demo en vivo",
         x: 78, y: 50, starX: 78, starY: 42,
+        mobileStarX: 80, mobileStarY: 42,
         cloud: { w: 240, h: 140,
             blobs: [
                 { l:"5%",  t:"26%",  w:"88%", h:"60%", blur:16 },
@@ -55,12 +59,13 @@ const projects = [
         },
     },
     {
-        id: 3, number: "04", name: "Tienda Zapatillas",
+        id: 3, number: "04", name: "Zapatillas",
         description: "E-commerce de zapatillas con catálogo, carrito y gestión de pedidos. Backend en PHP con base de datos MySQL.",
         stack: ["PHP", "MySQL", "HTML5", "CSS3"],
         github: "https://github.com/auroraaviz/tienda-Zapatillas-",
         demo: null, tag: "Fullstack",
         x: 30, y: 62, starX: 35, starY: 62,
+        mobileStarX: 22, mobileStarY: 58,
         cloud: { w: 290, h: 145,
             blobs: [
                 { l:"3%",  t:"26%",  w:"84%", h:"60%", blur:18 },
@@ -78,6 +83,7 @@ const projects = [
         github: "https://github.com/auroraaviz/pagina-web-ficticia_MENTA",
         demo: null, tag: "Maquetación",
         x: 62, y: 72, starX: 67, starY: 70,
+        mobileStarX: 60, mobileStarY: 74,
         cloud: { w: 210, h: 118,
             blobs: [
                 { l:"7%",  t:"28%",  w:"84%", h:"58%", blur:15 },
@@ -155,7 +161,6 @@ function StackPill({ tech }) {
     );
 }
 
-// Contenido día — texto oscuro sobre nube blanca
 function ProjectContent({ project }) {
     return (
         <div style={{ display:"flex", flexDirection:"column", gap:"9px" }}>
@@ -189,7 +194,6 @@ function ProjectContent({ project }) {
     );
 }
 
-// Contenido noche — texto claro
 function ProjectContentDark({ project }) {
     return (
         <div style={{ display:"flex", flexDirection:"column", gap:"9px" }}>
@@ -223,28 +227,20 @@ function ProjectContentDark({ project }) {
     );
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  CloudCard — nube única por proyecto que se expande moderadamente
-//  El contenido se centra en la zona densa de la nube (parte baja)
-// ─────────────────────────────────────────────────────────────────
+// ─── CloudCard (desktop) ───────────────────────────────────────────────────────
 function CloudCard({ project, isOpen, isHover, onOpen, onClose, onEnter, onLeave, scale = 1 }) {
     const { cloud } = project;
     const bw = cloud.w * scale;
     const bh = cloud.h * scale;
-
-    // Expansión moderada: 1.55x ancho, 2.2x alto — suficiente para el texto sin desproporción
     const openW = Math.max(bw * 1.55, 240 * scale);
     const openH = Math.max(bh * 2.2,  200 * scale);
-
     const w = isOpen ? openW : (isHover ? bw * 1.05 : bw);
     const h = isOpen ? openH : (isHover ? bh * 1.05 : bh);
-
-   const shadow = isOpen
+    const shadow = isOpen
         ? "drop-shadow(0 18px 44px rgba(100,30,220,0.35)) drop-shadow(0 4px 12px rgba(80,20,180,0.2)) drop-shadow(0 0 40px rgba(139,92,246,0.5))"
         : isHover
             ? "drop-shadow(0 12px 28px rgba(100,30,200,0.28)) drop-shadow(0 0 28px rgba(139,92,246,0.55)) drop-shadow(0 0 60px rgba(167,139,250,0.25))"
             : "drop-shadow(0 7px 18px rgba(100,30,200,0.16))";
-
     return (
         <motion.div
             onClick={isOpen ? onClose : onOpen}
@@ -252,13 +248,8 @@ function CloudCard({ project, isOpen, isHover, onOpen, onClose, onEnter, onLeave
             onMouseLeave={onLeave}
             animate={{ width:w, height:h }}
             transition={{ type:"spring", stiffness:155, damping:26 }}
-            style={{
-                position:"relative", cursor:"pointer",
-                zIndex: isOpen ? 20 : isHover ? 10 : 5,
-                filter:shadow, transition:"filter 0.35s ease",
-            }}
+            style={{ position:"relative", cursor:"pointer", zIndex: isOpen ? 20 : isHover ? 10 : 5, filter:shadow, transition:"filter 0.35s ease" }}
         >
-            {/* Blobs */}
             <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
                 {cloud.blobs.map((b, i) => (
                     <div key={i} style={{
@@ -268,7 +259,6 @@ function CloudCard({ project, isOpen, isHover, onOpen, onClose, onEnter, onLeave
                         filter:`blur(${b.blur * scale}px)`,
                     }}/>
                 ))}
-                {/* Brillo cenital */}
                 <div style={{
                     position:"absolute", left:"28%", top:"-20%",
                     width:"36%", height:"20%", borderRadius:"50%",
@@ -278,17 +268,13 @@ function CloudCard({ project, isOpen, isHover, onOpen, onClose, onEnter, onLeave
                     transition:"opacity 0.3s", pointerEvents:"none",
                 }}/>
             </div>
-
-            {/* Nombre — solo nube cerrada */}
             <motion.div
                 animate={{ opacity: isOpen ? 0 : 1 }}
                 transition={{ duration:0.15 }}
                 style={{
                     position:"absolute", inset:0, zIndex:10,
                     display:"flex", alignItems:"center", justifyContent:"center",
-                    // El centro visual de la nube está ligeramente más abajo que el centro geométrico
-                    paddingTop:`${bh * 0.08}px`,
-                    pointerEvents:"none",
+                    paddingTop:`${bh * 0.08}px`, pointerEvents:"none",
                 }}
             >
                 <span style={{
@@ -300,22 +286,14 @@ function CloudCard({ project, isOpen, isHover, onOpen, onClose, onEnter, onLeave
                     transition:"color 0.3s", userSelect:"none",
                 }}>{project.name}</span>
             </motion.div>
-
-            {/* Contenido abierto
-                top/left/right/bottom están calibrados para que el texto caiga
-                en el área densa central de la nube (evitando los bordes difusos)
-            */}
             <motion.div
                 animate={{ opacity: isOpen ? 1 : 0 }}
                 transition={{ duration:0.26, delay: isOpen ? 0.2 : 0 }}
                 style={{
-                    position:"absolute",
-                    // 22% desde arriba evita la zona de cúpulas, 16% desde abajo evita el borde difuso
-                    top:"22%", left:"14%", right:"14%", bottom:"16%",
+                    position:"absolute", top:"22%", left:"14%", right:"14%", bottom:"16%",
                     zIndex:11,
                     display:"flex", flexDirection:"column", justifyContent:"center",
-                    overflow:"hidden",
-                    pointerEvents: isOpen ? "auto" : "none",
+                    overflow:"hidden", pointerEvents: isOpen ? "auto" : "none",
                 }}
             >
                 <ProjectContent project={project}/>
@@ -324,7 +302,7 @@ function CloudCard({ project, isOpen, isHover, onOpen, onClose, onEnter, onLeave
     );
 }
 
-// ── DESKTOP DÍA ──
+// ─── DESKTOP DÍA ──────────────────────────────────────────────────────────────
 function DesktopDayProjects({ projects }) {
     const [openId, setOpenId]   = useState(null);
     const [hoverId, setHoverId] = useState(null);
@@ -349,27 +327,133 @@ function DesktopDayProjects({ projects }) {
     );
 }
 
-// ── MÓVIL DÍA — nubes apiladas, scale reducido ──
+// ─── MÓVIL DÍA — nubes en canvas 2D flotando, misma filosofía que desktop ─────
 function MobileDayProjects({ projects }) {
     const [openId, setOpenId]   = useState(null);
     const [hoverId, setHoverId] = useState(null);
+
+    // Posiciones adaptadas al viewport estrecho (distribuidas manualmente, sin solapamientos)
+    const mobilePositions = [
+        { x: 12, y: 8  },   // Turistea — arriba izquierda
+        { x: 52, y: 4  },   // Superverde — arriba derecha
+        { x: 62, y: 36 },   // DavanteDent — centro derecha
+        { x: 8,  y: 48 },   // Zapatillas — centro izquierda
+        { x: 38, y: 68 },   // Menta — abajo centro
+    ];
+
+    // Scale de nube para móvil: más pequeño pero suficiente para leer el nombre
+    const CLOUD_SCALE = 0.68;
+
     return (
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"28px", padding:"0 16px" }}>
-            {projects.map(project => {
+        // Canvas con altura fija + scroll si se expande alguna tarjeta
+        <div style={{
+            position: "relative",
+            width: "100%",
+            // Altura base del canvas: caben todas las nubes + margen
+            minHeight: 480,
+            height: 480,
+            overflow: "visible",
+        }}>
+            {projects.map((project, idx) => {
+                const pos    = mobilePositions[idx];
                 const isOpen  = openId  === project.id;
                 const isHover = hoverId === project.id;
+
+                const { cloud } = project;
+                const bw = cloud.w * CLOUD_SCALE;
+                const bh = cloud.h * CLOUD_SCALE;
+                const openW = Math.max(bw * 1.6, 220);
+                const openH = Math.max(bh * 2.4, 210);
+                const w = isOpen ? openW : bw;
+                const h = isOpen ? openH : bh;
+
+                const shadow = isOpen
+                    ? "drop-shadow(0 14px 36px rgba(100,30,220,0.38)) drop-shadow(0 0 32px rgba(139,92,246,0.5))"
+                    : "drop-shadow(0 6px 14px rgba(100,30,200,0.18))";
+
                 return (
-                    <motion.div key={project.id}
-                        initial={{ opacity:0, y:18 }}
-                        whileInView={{ opacity:1, y:0 }}
-                        viewport={{ once:true, margin:"-20px" }}
-                        transition={{ duration:0.45, delay:project.id*0.07 }}
-                        style={{ display:"flex", justifyContent:"center" }}
+                    <motion.div
+                        key={project.id}
+                        // Flotar igual que desktop
+                        animate={!isOpen ? { y: [0, -6, 0] } : { y: 0 }}
+                        transition={!isOpen
+                            ? { duration: 3.2 + project.id * 0.5, repeat: Infinity, ease: "easeInOut", delay: project.id * 0.55 }
+                            : { duration: 0.4 }}
+                        style={{
+                            position: "absolute",
+                            left: `${pos.x}%`,
+                            top: `${pos.y}%`,
+                            // Anclar por el centro de la nube
+                            transform: "translate(-50%, -50%)",
+                            zIndex: isOpen ? 30 : 5,
+                        }}
                     >
-                        <CloudCard project={project} isOpen={isOpen} isHover={isHover}
-                            onOpen={() => setOpenId(project.id)} onClose={() => setOpenId(null)}
-                            onEnter={() => setHoverId(project.id)} onLeave={() => setHoverId(null)}
-                            scale={0.75}/>
+                        {/* Nube — igual que CloudCard pero inline para control total */}
+                        <motion.div
+                            onClick={() => setOpenId(isOpen ? null : project.id)}
+                            onMouseEnter={() => setHoverId(project.id)}
+                            onMouseLeave={() => setHoverId(null)}
+                            animate={{ width: w, height: h }}
+                            transition={{ type: "spring", stiffness: 150, damping: 26 }}
+                            style={{
+                                position: "relative", cursor: "pointer",
+                                filter: shadow, transition: "filter 0.3s ease",
+                            }}
+                        >
+                            {/* Blobs */}
+                            <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
+                                {cloud.blobs.map((b, i) => (
+                                    <div key={i} style={{
+                                        position:"absolute", left:b.l, top:b.t, width:b.w, height:b.h,
+                                        borderRadius:"50%",
+                                        background: i === 0 ? "rgba(250,246,255,0.95)" : "rgba(243,235,255,0.90)",
+                                        filter:`blur(${b.blur * CLOUD_SCALE}px)`,
+                                    }}/>
+                                ))}
+                                <div style={{
+                                    position:"absolute", left:"28%", top:"-20%",
+                                    width:"36%", height:"20%", borderRadius:"50%",
+                                    background:"rgba(255,255,255,0.78)",
+                                    filter:`blur(${5}px)`, opacity:0.7, pointerEvents:"none",
+                                }}/>
+                            </div>
+
+                            {/* Nombre — visible en cerrado */}
+                            <motion.div
+                                animate={{ opacity: isOpen ? 0 : 1 }}
+                                transition={{ duration: 0.15 }}
+                                style={{
+                                    position:"absolute", inset:0, zIndex:10,
+                                    display:"flex", alignItems:"center", justifyContent:"center",
+                                    paddingTop:`${bh * 0.08}px`, pointerEvents:"none",
+                                }}
+                            >
+                                <span style={{
+                                    fontFamily:"'Syne',sans-serif",
+                                    fontSize:`${Math.max(bw * 0.075, 10)}px`,
+                                    fontWeight:"700",
+                                    color:"rgba(55,12,120,0.88)",
+                                    textAlign:"center", padding:"0 10px",
+                                    userSelect:"none",
+                                }}>{project.name}</span>
+                            </motion.div>
+
+                            {/* Contenido expandido */}
+                            <motion.div
+                                animate={{ opacity: isOpen ? 1 : 0 }}
+                                transition={{ duration: 0.24, delay: isOpen ? 0.18 : 0 }}
+                                style={{
+                                    position:"absolute",
+                                    top:"20%", left:"12%", right:"12%", bottom:"14%",
+                                    zIndex:11,
+                                    display:"flex", flexDirection:"column", justifyContent:"center",
+                                    overflow:"hidden",
+                                    pointerEvents: isOpen ? "auto" : "none",
+                                }}
+                            >
+                                <ProjectContent project={project}/>
+                            </motion.div>
+                        </motion.div>
                     </motion.div>
                 );
             })}
@@ -377,7 +461,7 @@ function MobileDayProjects({ projects }) {
     );
 }
 
-// ── DESKTOP NOCHE ──
+// ─── DESKTOP NOCHE ────────────────────────────────────────────────────────────
 function DesktopNightProjects({ projects }) {
     const [openId, setOpenId]   = useState(null);
     const [hoverId, setHoverId] = useState(null);
@@ -470,54 +554,204 @@ function DesktopNightProjects({ projects }) {
     );
 }
 
-// ── MÓVIL NOCHE ──
+// ─── MÓVIL NOCHE — constelación 2D en SVG, igual que desktop ─────────────────
 function MobileNightProjects({ projects }) {
     const [openId, setOpenId] = useState(null);
+    const [hoverId, setHoverId] = useState(null);
+    const lineDelays = useMemo(() => constellationLines.map((_, i) => i * 0.3), []);
+
+    const openProject = openId !== null ? projects.find(p => p.id === openId) : null;
+
     return (
-        <div style={{ display:"flex", flexDirection:"column", gap:"10px", padding:"0 16px" }}>
-            {projects.map(project => {
-                const isOpen = openId === project.id;
-                return (
-                    <motion.div key={project.id}
-                        initial={{ opacity:0, y:14 }}
-                        whileInView={{ opacity:1, y:0 }}
-                        viewport={{ once:true, margin:"-16px" }}
-                        transition={{ duration:0.4, delay:project.id*0.06 }}
+        <div style={{ position: "relative", width: "100%", padding: "0 8px" }}>
+            <ShootingStar />
+
+            {/* Canvas de constelación */}
+            <div style={{ position: "relative", width: "100%", paddingBottom: "90%" }}>
+                <div style={{ position: "absolute", inset: 0 }}>
+
+                    {/* SVG de líneas — capa baja */}
+                    <svg
+                        style={{
+                            position: "absolute", top: 0, left: 0,
+                            width: "100%", height: "100%",
+                            pointerEvents: "none", zIndex: 1, overflow: "visible",
+                        }}
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="none"
                     >
-                        <div onClick={() => setOpenId(isOpen ? null : project.id)} style={{
-                            borderRadius:"14px",
-                            border:`1px solid ${isOpen ? "rgba(167,139,250,0.35)" : "rgba(167,139,250,0.12)"}`,
-                            background: isOpen ? "rgba(8,2,24,0.9)" : "rgba(6,1,16,0.55)",
-                            backdropFilter:"blur(14px)",
-                            overflow:"hidden", cursor:"pointer", transition:"all 0.28s",
-                            boxShadow: isOpen ? "0 6px 28px rgba(80,20,180,0.3)" : "none",
-                        }}>
-                            <div style={{ padding:"14px 16px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                                <div style={{ display:"flex", alignItems:"center", gap:"9px" }}>
-                                    <div style={{ width:7, height:7, borderRadius:"50%", background:"#e9d5ff", boxShadow:"0 0 7px 2px rgba(196,165,253,0.55)", flexShrink:0 }}/>
-                                    <span style={{ fontFamily:"'Syne',sans-serif", fontSize:"0.95rem", fontWeight:"700", color:"#fff" }}>{project.name}</span>
-                                </div>
-                                <motion.span animate={{ rotate:isOpen?180:0 }} transition={{ duration:0.28 }}
-                                    style={{ color:"rgba(196,165,253,0.55)", fontSize:"11px" }}>▾</motion.span>
+                        <defs>
+                            <filter id="mgl" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="1.5" result="b"/>
+                                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="mgls" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="0.8" result="b"/>
+                                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        {constellationLines.map(([a, b], i) => {
+                            const pa = projects[a], pb = projects[b];
+                            const isMain = i < 2;
+                            return (
+                                <g key={i}>
+                                    {/* Halo difuso */}
+                                    <motion.line
+                                        x1={pa.mobileStarX} y1={pa.mobileStarY}
+                                        x2={pb.mobileStarX} y2={pb.mobileStarY}
+                                        stroke="rgba(167,139,250,0.1)"
+                                        strokeWidth={isMain ? "3" : "2"}
+                                        strokeLinecap="round"
+                                        filter="url(#mgls)"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: lineDelays[i] + 0.4, duration: 1.2 }}
+                                    />
+                                    {/* Línea principal */}
+                                    <motion.line
+                                        x1={pa.mobileStarX} y1={pa.mobileStarY}
+                                        x2={pb.mobileStarX} y2={pb.mobileStarY}
+                                        stroke={isMain ? "rgba(196,165,253,0.45)" : "rgba(196,165,253,0.28)"}
+                                        strokeWidth={isMain ? "0.9" : "0.6"}
+                                        strokeDasharray={isMain ? "none" : "3 5"}
+                                        strokeLinecap="round"
+                                        filter="url(#mgl)"
+                                        initial={{ opacity: 0, pathLength: 0 }}
+                                        animate={{ opacity: 1, pathLength: 1 }}
+                                        transition={{ delay: lineDelays[i], duration: 1.5, ease: "easeOut" }}
+                                    />
+                                </g>
+                            );
+                        })}
+                    </svg>
+
+                    {/* Estrellas — posicionadas en % sobre el contenedor */}
+                    {projects.map(project => {
+                        const isOpen  = openId  === project.id;
+                        const isHover = hoverId === project.id;
+                        const sz = isOpen || isHover ? 16 : 9;
+
+                        return (
+                            <div
+                                key={project.id}
+                                style={{
+                                    position: "absolute",
+                                    left: `${project.mobileStarX}%`,
+                                    top:  `${project.mobileStarY}%`,
+                                    transform: "translate(-50%, -50%)",
+                                    zIndex: isOpen ? 20 : 5,
+                                }}
+                            >
+                                {/* Halo pulsante */}
+                                <motion.div
+                                    animate={{ opacity: [0.15, 0.4, 0.15], scale: [0.9, 1.2, 0.9] }}
+                                    transition={{ duration: 3 + project.id * 0.4, repeat: Infinity, ease: "easeInOut" }}
+                                    style={{
+                                        position: "absolute", top: "50%", left: "50%",
+                                        width: 40, height: 40, transform: "translate(-50%,-50%)",
+                                        borderRadius: "50%",
+                                        background: "radial-gradient(circle,rgba(196,165,253,0.4) 0%,rgba(139,92,246,0.15) 50%,transparent 75%)",
+                                        pointerEvents: "none",
+                                    }}
+                                />
+
+                                {/* Punto estrella — tappable */}
+                                <motion.div
+                                    animate={{ scale: [1, 1.2, 1], opacity: [0.85, 1, 0.85] }}
+                                    transition={{ duration: 2.5 + project.id * 0.4, repeat: Infinity, ease: "easeInOut" }}
+                                    onClick={() => setOpenId(isOpen ? null : project.id)}
+                                    onMouseEnter={() => setHoverId(project.id)}
+                                    onMouseLeave={() => setHoverId(null)}
+                                    style={{
+                                        position: "relative",
+                                        width: sz, height: sz, borderRadius: "50%",
+                                        background: "radial-gradient(circle at 35% 35%,#ffffff,#e9d5ff)",
+                                        boxShadow: isOpen || isHover
+                                            ? "0 0 18px 6px rgba(196,165,253,0.85),0 0 40px 14px rgba(139,92,246,0.4)"
+                                            : "0 0 8px 2px rgba(196,165,253,0.65),0 0 18px 4px rgba(139,92,246,0.25)",
+                                        cursor: "pointer", transition: "all 0.3s", zIndex: 2,
+                                    }}
+                                />
+
+                                {/* Tooltip de nombre — visible al hover / tap (cuando no está el panel) */}
+                                <AnimatePresence>
+                                    {(isHover || isOpen) && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 4 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 2 }}
+                                            style={{
+                                                position: "absolute",
+                                                // Posicionar arriba de la estrella (o abajo si está muy alta)
+                                                bottom: project.mobileStarY < 20 ? "auto" : "calc(100% + 10px)",
+                                                top:    project.mobileStarY < 20 ? "calc(100% + 10px)" : "auto",
+                                                left: "50%", transform: "translateX(-50%)",
+                                                whiteSpace: "nowrap", textAlign: "center",
+                                                pointerEvents: "none", zIndex: 10,
+                                            }}
+                                        >
+                                            <span style={{
+                                                display: "block",
+                                                fontFamily: "'Syne',sans-serif", fontSize: "11px", fontWeight: "700",
+                                                color: "#f5f0ff", textShadow: "0 0 14px rgba(167,139,250,1)",
+                                            }}>{project.name}</span>
+                                            <span style={{
+                                                display: "block",
+                                                fontFamily: "'DM Mono',monospace", fontSize: "8px",
+                                                color: "rgba(196,165,253,0.65)", letterSpacing: "1.5px",
+                                                textTransform: "uppercase", marginTop: "2px",
+                                            }}>{project.tag}</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
-                            <AnimatePresence>
-                                {isOpen && (
-                                    <motion.div initial={{ height:0, opacity:0 }} animate={{ height:"auto", opacity:1 }} exit={{ height:0, opacity:0 }}
-                                        transition={{ duration:0.3, ease:"easeInOut" }} style={{ overflow:"hidden" }}>
-                                        <div style={{ padding:"0 16px 16px", borderTop:"1px solid rgba(167,139,250,0.08)", paddingTop:"12px" }}>
-                                            <ProjectContentDark project={project}/>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Panel de detalle — debajo del canvas, se desliza */}
+            <AnimatePresence>
+                {openProject && (
+                    <motion.div
+                        key={openProject.id}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        style={{
+                            margin: "0 8px 32px",
+                            background: "rgba(5,1,18,0.94)",
+                            backdropFilter: "blur(28px)",
+                            border: "1px solid rgba(167,139,250,0.28)",
+                            borderRadius: "18px",
+                            padding: "18px",
+                            boxShadow: "0 12px 48px rgba(109,40,217,0.42),inset 0 1px 0 rgba(196,165,253,0.1)",
+                            position: "relative",
+                        }}
+                        onClick={() => setOpenId(null)}
+                    >
+                        {/* Línea decorativa superior */}
+                        <div style={{
+                            position: "absolute", top: 0, left: "15%", right: "15%",
+                            height: "1px",
+                            background: "linear-gradient(to right,transparent,rgba(196,165,253,0.65),transparent)",
+                        }}/>
+                        <ProjectContentDark project={openProject}/>
+                        {/* Hint para cerrar */}
+                        <p style={{
+                            textAlign: "center", marginTop: "12px", marginBottom: 0,
+                            fontFamily: "'DM Mono',monospace", fontSize: "8px",
+                            color: "rgba(196,165,253,0.4)", letterSpacing: "1.5px",
+                        }}>toca para cerrar</p>
                     </motion.div>
-                );
-            })}
+                )}
+            </AnimatePresence>
         </div>
     );
 }
 
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
 export default function Projects({ isNight = false }) {
     const isMobile = useIsMobile();
     return (
@@ -526,7 +760,6 @@ export default function Projects({ isNight = false }) {
             minHeight:"110vh", paddingBottom:"120px",
             background:"transparent", overflow:"visible",
         }}>
-            {/* Título — Poppins, tamaño moderado */}
             <motion.div
                 initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
                 style={{ textAlign:"center", marginBottom:"44px", padding:"0 24px" }}
@@ -543,18 +776,19 @@ export default function Projects({ isNight = false }) {
             </motion.div>
 
             {isMobile ? (
-                isNight ? <MobileNightProjects projects={projects}/> : <MobileDayProjects projects={projects}/>
+                isNight
+                    ? <MobileNightProjects projects={projects}/>
+                    : <MobileDayProjects   projects={projects}/>
             ) : isNight ? (
                 <DesktopNightProjects projects={projects}/>
             ) : (
                 <DesktopDayProjects projects={projects}/>
             )}
 
-            {/* Hint */}
             <motion.p
                 initial={{ opacity:0 }} whileInView={{ opacity:1 }} viewport={{ once:true }} transition={{ delay:0.5 }}
                 style={{
-                    textAlign:"center", marginTop:isMobile?"32px":"18px",
+                    textAlign:"center", marginTop: isMobile ? "16px" : "18px",
                     fontFamily:"'Poppins',sans-serif", fontSize:"11px", fontWeight:"400",
                     letterSpacing:"2px", textTransform:"uppercase",
                     color:"rgba(220,200,255,0.72)",
@@ -562,7 +796,7 @@ export default function Projects({ isNight = false }) {
                 }}
             >
                 {isMobile
-                    ? (isNight ? "✦ toca una estrella ✦" : "☁ toca una nube ☁")
+                    ? (isNight ? "✦ toca una estrella ✦" : "☁ pulsa una nube ☁")
                     : isNight ? "✦ explora las constelaciones ✦" : "☁ pulsa una nube para descubrir el proyecto ☁"}
             </motion.p>
         </section>
