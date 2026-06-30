@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getTheme } from "../theme";
 
 const grupos = [
     {
@@ -93,71 +94,21 @@ function ShootingStar({ color }) {
 function ConstellationGroup({ grupo, gi, currentMode }) {
     const [hoveredStar, setHoveredStar] = useState(null);
 
-    const theme = useMemo(() => {
-        switch (currentMode) {
-            case "noche":
-                return {
-                    canvasBg:       "rgba(8, 5, 24, 0.85)",
-                    canvasBgHover:  "rgba(18, 10, 50, 0.95)",
-                    canvasBorder:   "rgba(255, 255, 255, 0.08)",
-                    headerText:     "#e2e8ff",
-                    labelText:      "rgba(210, 215, 255, 0.65)",
-                    labelTextHover: "#ffffff",
-                    lineColor:      `${grupo.color}20`,
-                    lineColorMain:  `${grupo.color}cc`,
-                    tooltipBg:      "rgba(15, 12, 38, 0.97)",
-                    tooltipText:    "#f3f4f6",
-                    boxShadow:      "0 12px 40px -10px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.06)",
-                    boxShadowHover: `0 0 0 1px ${grupo.color}44, 0 16px 48px -8px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.09)`,
-                };
-            case "amanecer":
-                return {
-                    canvasBg:       "rgba(255, 255, 255, 0.12)",
-                    canvasBgHover:  "rgba(255, 255, 255, 0.22)",
-                    canvasBorder:   "rgba(255, 255, 255, 0.5)",
-                    headerText:     "#2e1065",
-                    labelText:      "rgba(46, 16, 101, 0.65)",
-                    labelTextHover: "#2e1065",
-                    lineColor:      `${grupo.color}30`,
-                    lineColorMain:  `${grupo.color}95`,
-                    tooltipBg:      "rgba(255, 255, 255, 0.97)",
-                    tooltipText:    "#2e1065",
-                    boxShadow:      "0 10px 30px -10px rgba(30,27,75,0.08), inset 0 1px 1px rgba(255,255,255,0.2)",
-                    boxShadowHover: `0 0 0 1px ${grupo.color}44, 0 14px 40px -8px rgba(30,27,75,0.15), inset 0 1px 1px rgba(255,255,255,0.25)`,
-                };
-            case "atardecer":
-                return {
-                    canvasBg:       "rgba(255, 255, 255, 0.08)",
-                    canvasBgHover:  "rgba(255, 255, 255, 0.16)",
-                    canvasBorder:   "rgba(255, 255, 255, 0.35)",
-                    headerText:     "#e2e0ff",
-                    labelText:      "rgba(220, 218, 255, 0.65)",
-                    labelTextHover: "#ffffff",
-                    lineColor:      `${grupo.color}25`,
-                    lineColorMain:  `${grupo.color}a0`,
-                    tooltipBg:      "rgba(30, 11, 54, 0.97)",
-                    tooltipText:    "#f0edff",
-                    boxShadow:      "0 10px 30px -10px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.1)",
-                    boxShadowHover: `0 0 0 1px ${grupo.color}44, 0 14px 40px -8px rgba(0,0,0,0.35), inset 0 1px 1px rgba(255,255,255,0.14)`,
-                };
-            case "mediodia":
-            default:
-                return {
-                    canvasBg:       "rgba(255, 255, 255, 0.15)",
-                    canvasBgHover:  "rgba(255, 255, 255, 0.28)",
-                    canvasBorder:   "rgba(255, 255, 255, 0.6)",
-                    headerText:     "#1e1b4b",
-                    labelText:      "rgba(30, 27, 75, 0.6)",
-                    labelTextHover: "#1e1b4b",
-                    lineColor:      `${grupo.color}35`,
-                    lineColorMain:  `${grupo.color}90`,
-                    tooltipBg:      "rgba(255, 255, 255, 0.99)",
-                    tooltipText:    "#1e1b4b",
-                    boxShadow:      "0 10px 30px -10px rgba(30,27,75,0.06), inset 0 1px 1px rgba(255,255,255,0.2)",
-                    boxShadowHover: `0 0 0 1px ${grupo.color}44, 0 14px 40px -8px rgba(30,27,75,0.12), inset 0 1px 1px rgba(255,255,255,0.25)`,
-                };
-        }
-    }, [grupo.color, currentMode]);
+    const base = getTheme(currentMode);
+    const theme = useMemo(() => ({
+        canvasBg:       base.cardBg,
+        canvasBgHover:  base.cardBgHover,
+        canvasBorder:   base.cardBorder,
+        headerText:     base.headerText,
+        labelText:      base.labelColor,
+        labelTextHover: base.dark ? "#ffffff" : base.headerText,
+        lineColor:      `${grupo.color}${base.dark ? "20" : "30"}`,
+        lineColorMain:  `${grupo.color}${base.dark ? "cc" : "95"}`,
+        tooltipBg:      base.tooltipBg,
+        tooltipText:    base.tooltipText,
+        boxShadow:      base.canvasBoxShadow,
+        boxShadowHover: `0 0 0 1px ${grupo.color}44, ${base.canvasBoxShadow.replace(/0\.0?\d+(?=\))/, m => Math.min(parseFloat(m) + 0.06, 1).toFixed(2))}`,
+    }), [grupo.color, base]);
 
     const isNight = currentMode === "noche";
 
@@ -176,7 +127,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                     textShadow: isNight ? `0 0 14px ${grupo.color}` : "none",
                 }}>{grupo.glyph}</span>
                 <span style={{
-                    fontFamily: "'Syne', sans-serif", fontSize: "1.1rem", fontWeight: 700,
+                    fontFamily: "'DM Mono', monospace", fontSize: "1.1rem", fontWeight: 700,
                     color: theme.headerText, letterSpacing: "0.8px",
                     textShadow: isNight ? "0 0 20px rgba(167,139,250,0.4)" : "none",
                 }}>{grupo.categoria}</span>
@@ -189,7 +140,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
             {/* Panel */}
             <div
                 style={{
-                    position: "relative", width: "100%", height: 240, borderRadius: 24,
+                    position: "relative", width: "100%", height: "clamp(200px, 28vw, 240px)", borderRadius: 24,
                     background: theme.canvasBg,
                     border: `1px solid ${theme.canvasBorder}`,
                     boxShadow: theme.boxShadow,
@@ -334,7 +285,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                                         }} />
                                         <span style={{
                                             fontFamily: "'DM Mono', monospace",
-                                            fontSize: "0.75rem", fontWeight: 600,
+                                            fontSize: "0.8rem", fontWeight: 600,
                                             color: theme.tooltipText, letterSpacing: "0.4px",
                                         }}>{skill.nombre}</span>
                                     </motion.div>
@@ -345,8 +296,8 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                             <span style={{
                                 position: "absolute", top: "calc(100% + 8px)", left: "50%",
                                 transform: "translateX(-50%)",
-                                fontFamily: "'DM Mono', monospace", fontSize: "9.5px",
-                                fontWeight: 500, letterSpacing: "0.3px",
+                                fontFamily: "'DM Mono', monospace", fontSize: "clamp(9px, 2.2vw, 11px)",
+                                fontWeight: 500, letterSpacing: "0.5px",
                                 color: theme.labelText,
                                 whiteSpace: "nowrap", pointerEvents: "none",
                             }}>{skill.nombre}</span>
@@ -361,13 +312,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
 export default function Habilidades({ sky = {} }) {
     const currentMode = sky?.label || "mediodia";
     const isNight = currentMode === "noche";
-
-    const titleGradient = useMemo(() => {
-        if (currentMode === "noche")     return "linear-gradient(to right, #ffffff, rgba(192, 132, 252, 0.95))";
-        if (currentMode === "amanecer")  return "linear-gradient(to right, #2e1065, #db2777)";
-        if (currentMode === "atardecer") return "linear-gradient(to right, #8b5cf6, #2dd4bf)";
-        return "linear-gradient(to right, #1e1b4b, rgba(99, 102, 241, 0.9))";
-    }, [currentMode]);
+    const theme = getTheme(currentMode);
 
     return (
         <section id="habilidades" style={{
@@ -386,14 +331,14 @@ export default function Habilidades({ sky = {} }) {
                     style={{ textAlign: "center", marginBottom: 70, isolation: "isolate" }}
                 >
                     <h2 style={{
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'DM Mono', monospace",
                         fontSize: "clamp(1.8rem, 4vw, 2.6rem)",
-                        fontWeight: 700, margin: "0 0 14px 0", letterSpacing: "0.5px",
+                        fontWeight: 700, margin: "0 0 14px 0", letterSpacing: "2px",
                     }}>
                         <span
                             key={currentMode}
                             style={{
-                                background: titleGradient,
+                                background: theme.titleGradient,
                                 WebkitBackgroundClip: "text",
                                 WebkitTextFillColor: "transparent",
                                 backgroundClip: "text",
@@ -428,7 +373,7 @@ export default function Habilidades({ sky = {} }) {
                         textAlign: "center", marginTop: 54,
                         fontFamily: "'DM Mono', monospace",
                         fontSize: "11px", letterSpacing: "3px", textTransform: "uppercase",
-                        color: isNight ? "rgba(233, 213, 255, 0.6)" : "rgba(30, 27, 75, 0.5)",
+                        color: theme.subtitleColor,
                     }}
                 >
                     ✦ explora las estrellas para descubrir detalles · learning everyday ✦
@@ -436,10 +381,16 @@ export default function Habilidades({ sky = {} }) {
             </div>
 
             <style>{`
+
                 @media (max-width: 768px) {
-                    .habilidades-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+                    .habilidades-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
                 }
-            `}</style>
+                @media (max-width: 380px) {
+                    .habilidades-grid { gap: 14px !important; }
+                }
+
+            `}
+            </style>
         </section>
     );
 }

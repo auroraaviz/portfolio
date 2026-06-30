@@ -52,11 +52,13 @@ export default function Hero({ sky = {}, onNameClick }) {
                     style={{
                         fontSize: "clamp(3rem,9vw,6rem)", fontWeight: "700", color: "#ffffff",
                         lineHeight: 1.05, marginBottom: "10px",
-                        fontFamily: "'Plus Jakarta Sans',sans-serif", letterSpacing: "-1px",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        letterSpacing: hoverName ? "10px" : "2px",
                         textShadow: hoverName
-                            ? "0 2px 40px rgba(196,165,253,0.85),0 0 80px rgba(139,92,246,0.55)"
+                            ? "0 2px 40px rgba(196,165,253,0.85),0 0 80px rgba(139,92,246,0.55),0 0 120px rgba(167,139,250,0.3)"
                             : "0 2px 30px rgba(167,139,250,0.5),0 0 60px rgba(139,92,246,0.3)",
-                        cursor: "pointer", userSelect: "none", transition: "text-shadow 0.35s ease",
+                        cursor: "pointer", userSelect: "none",
+                        transition: "letter-spacing 0.45s cubic-bezier(0.25,0.46,0.45,0.94), text-shadow 0.35s ease",
                     }}
                 >
                     Aurora Ávila
@@ -67,7 +69,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                     style={{
                         fontFamily: "'DM Mono',monospace",
                         fontSize: "12px", letterSpacing: "4px",
-                        textTransform: "uppercase", marginBottom: "20px",
+                        textTransform: "uppercase", marginBottom: "clamp(12px, 3vw, 20px)",
                         pointerEvents: "none", transition: "all 0.4s ease",
                         color: sky?.label === "mediodia" ? "#2e1065" : "#f4f1ff",
                         textShadow: sky?.label === "mediodia"
@@ -84,7 +86,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                     transition={{ delay: 0.6, duration: 0.5 }}
                     style={{
                         fontSize: "clamp(0.95rem,2.2vw,1.1rem)", color: "#f5f0ff",
-                        maxWidth: "480px", margin: "0 auto 36px", lineHeight: 1.6,
+                        maxWidth: "480px", margin: "0 auto clamp(20px, 5vw, 36px)", lineHeight: 1.6,
                         fontFamily: "'Poppins',sans-serif", fontWeight: "300", letterSpacing: "0.5px",
                         textShadow: "0 1px 4px rgba(0,0,0,0.55),0 0 24px rgba(109,40,217,0.4)",
                     }}
@@ -101,7 +103,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                         onMouseEnter={() => setHoverBtn(true)}
                         onMouseLeave={() => setHoverBtn(false)}
                         style={{
-                            display: "inline-block", padding: "13px 36px", borderRadius: "30px",
+                            display: "inline-block", padding: "12px clamp(20px, 6vw, 36px)", borderRadius: "30px",
                             border: "1.5px solid rgba(233,213,255,0.65)", color: "#f0e6ff",
                             background: hoverBtn ? "rgba(139,92,246,0.5)" : "rgba(109,40,217,0.25)",
                             backdropFilter: "blur(12px)", textDecoration: "none",

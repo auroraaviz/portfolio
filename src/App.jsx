@@ -92,7 +92,15 @@ function Nebulae() {
 function SkySelector({ currentMode, onSelect }) {
     const [expanded, setExpanded] = useState(false);
     return (
-        <div style={{ position:"fixed", top:"20px", left:"20px", zIndex:100, display:"flex", flexDirection:"column", gap:"8px" }}>
+        <div style={{
+            position: "fixed",
+            top: "max(20px, env(safe-area-inset-top, 20px))",
+            left: "max(20px, env(safe-area-inset-left, 20px))",
+            zIndex: 100,
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+        }}>
             <motion.button onClick={() => setExpanded(e => !e)} whileHover={{ scale:1.05 }} whileTap={{ scale:0.95 }}
                 style={{ display:"flex", alignItems:"center", gap:"7px", padding:"7px 12px 7px 8px", borderRadius:"20px", background:"rgba(5,1,18,0.6)", backdropFilter:"blur(12px)", border:"1px solid rgba(167,139,250,0.35)", boxShadow:"0 2px 12px rgba(109,40,217,0.3)", cursor:"pointer" }}>
                 <div style={{ width:20, height:20, borderRadius:"50%", flexShrink:0, background:`linear-gradient(to bottom,${SKY_MODES[currentMode].swatch[0]},${SKY_MODES[currentMode].swatch[2]})`, border:"1.5px solid rgba(233,213,255,0.5)" }} />
@@ -125,8 +133,6 @@ export default function App() {
     const [section, setSection] = useState("hero");
 
     const sky     = SKY_MODES[modeKey];
-    // isNight = true solo para noche; atardecer y amanecer tienen fondos oscuros
-    // pero Projects/Contacto los tratan de forma independiente con su propio isNight
     const isNight = sky.label === "noche";
     const isDark  = sky.label === "noche" || sky.label === "atardecer" || sky.label === "amanecer";
     const isDaytime = sky.label === "mediodia";
@@ -211,11 +217,9 @@ export default function App() {
                             sky={sky}
                             onNameClick={() => setSection("sobremi")}
                         />
-                        {/* Projects y Contacto siguen recibiendo isNight como siempre */}
-                        <Projects    isNight={isNight} />
-                        {/* Habilidades recibe sky completo para sus 4 temas */}
+                        <Projects    sky={sky} />
                         <Habilidades sky={sky} />
-                        <Contacto    isNight={isDark} />
+                        <Contacto    sky={sky} />
                     </div>
                 )}
                 {section === "sobremi" && (

@@ -6,7 +6,6 @@
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background: #0f0c29;
 }
 
 @keyframes hintAppear {
@@ -27,4 +26,3 @@ body {
     opacity: 0 !important;
     transition: opacity 0.3s ease;
 }
-
