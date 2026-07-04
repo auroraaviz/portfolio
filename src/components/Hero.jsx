@@ -52,9 +52,11 @@ export default function Hero({ sky = {}, onNameClick }) {
                     style={{
                         fontSize: "clamp(3rem,9vw,6rem)", fontWeight: "700", color: "#ffffff",
                         lineHeight: 1.05, marginBottom: "10px",
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        letterSpacing: hoverName ? "10px" : "2px",
-                        textShadow: hoverName
+                         fontFamily: "'Syncopate', sans-serif",
+                         fontWeight: "400",
+                         textTransform: "uppercase",
+                         letterSpacing: hoverName ? "9px" : "3px",
+                         textShadow: hoverName
                             ? "0 2px 40px rgba(196,165,253,0.85),0 0 80px rgba(139,92,246,0.55),0 0 120px rgba(167,139,250,0.3)"
                             : "0 2px 30px rgba(167,139,250,0.5),0 0 60px rgba(139,92,246,0.3)",
                         cursor: "pointer", userSelect: "none",
@@ -99,21 +101,39 @@ export default function Hero({ sky = {}, onNameClick }) {
                     animate={{ opacity: clicked ? 0 : 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                 >
-                    <a href="#contacto"
+                    <a
+                        href="#contacto"
                         onMouseEnter={() => setHoverBtn(true)}
                         onMouseLeave={() => setHoverBtn(false)}
                         style={{
-                            display: "inline-block", padding: "12px clamp(20px, 6vw, 36px)", borderRadius: "30px",
-                            border: "1.5px solid rgba(233,213,255,0.65)", color: "#f0e6ff",
-                            background: hoverBtn ? "rgba(139,92,246,0.5)" : "rgba(109,40,217,0.25)",
-                            backdropFilter: "blur(12px)", textDecoration: "none",
-                            fontWeight: "500", fontSize: "13px", fontFamily: "'Poppins',sans-serif",
-                            letterSpacing: "2px", textTransform: "uppercase", transition: "all 0.3s ease",
+                            display: "inline-flex", alignItems: "center", gap: "8px",
+                            padding: "11px clamp(22px, 6vw, 38px)",
+                            borderRadius: "40px",
+                            border: `1px solid rgba(233,213,255,${hoverBtn ? "0.55" : "0.28"})`,
+                            background: hoverBtn
+                                ? "rgba(139,92,246,0.22)"
+                                : "rgba(139,92,246,0.08)",
+                            backdropFilter: "blur(16px)",
+                            color: "rgba(240,230,255,0.92)",
+                            textDecoration: "none",
+                            fontFamily: "'DM Mono',monospace",
+                            fontSize: "11px", fontWeight: "500",
+                            letterSpacing: "3px", textTransform: "uppercase",
+                            transition: "all 0.4s ease",
                             boxShadow: hoverBtn
-                                ? "0 4px 28px rgba(139,92,246,0.55),inset 0 1px 0 rgba(255,255,255,0.1)"
-                                : "0 2px 16px rgba(109,40,217,0.3),inset 0 1px 0 rgba(255,255,255,0.07)",
+                                ? "0 0 32px rgba(139,92,246,0.25), inset 0 1px 0 rgba(255,255,255,0.1)"
+                                : "inset 0 1px 0 rgba(255,255,255,0.06)",
                         }}
-                    >Contacto</a>
+                    >
+                        contacto
+                        <span style={{
+                            opacity: hoverBtn ? 1 : 0.45,
+                            transition: "opacity 0.4s ease, transform 0.4s ease",
+                            transform: hoverBtn ? "translateX(3px)" : "translateX(0)",
+                            display: "inline-block",
+                            fontSize: "10px",
+                        }}>✦</span>
+                    </a>
                 </motion.div>
             </div>
 

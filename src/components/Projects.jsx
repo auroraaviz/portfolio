@@ -138,7 +138,9 @@ function ProjectContent({ project, theme }) {
         <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
             <div style={{ display:"flex", alignItems:"baseline", gap:"6px" }}>
                 <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"10px", color:numberColor, flexShrink:0 }}>{project.number}</span>
-                <span style={{ fontFamily:"'DM Mono',monospace", letterSpacing:"2px", fontSize:"1rem", fontWeight:"700", color:nameColor, lineHeight:1.2 }}>{project.name}</span>
+                <span style={{ fontFamily:"'Poppins',sans-serif", letterSpacing:"1px", fontSize:"1rem", fontWeight:"700", color:nameColor, lineHeight:1.2 }}>{project.name}</span>
+
+
             </div>
             <p style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.73rem", color:descColor, lineHeight:1.65, margin:0 }}>
                 {project.description}
@@ -234,7 +236,7 @@ function DesktopConstellation({ projects, theme }) {
                             {isHover&&!isOpen&&(
                                 <motion.div initial={{opacity:0,y:5}} animate={{opacity:1,y:0}} exit={{opacity:0,y:2}}
                                     style={{position:"absolute",bottom:"calc(100% + 14px)",left:"50%",transform:"translateX(-50%)",whiteSpace:"nowrap",textAlign:"center",pointerEvents:"none",zIndex:10}}>
-                                    <span style={{display:"block",fontFamily:"'DM Mono',monospace",letterSpacing:"2px",fontSize:"14px",fontWeight:"700",color:theme.nameColor,textShadow:theme.nameShadow}}>{project.name}</span>
+                                    <span style={{display:"block",fontFamily:"'Poppins',sans-serif",letterSpacing:"0.5px",fontSize:"14px",fontWeight:"700",color:theme.nameColor,textShadow:theme.nameShadow}}>{project.name}</span>
                                     <span style={{display:"block",fontFamily:"'DM Mono',monospace",fontSize:"9px",color:theme.tagColor,letterSpacing:"2px",textTransform:"uppercase",marginTop:"3px"}}>{project.tag}</span>
                                 </motion.div>
                             )}
@@ -348,6 +350,7 @@ function MobileConstellation({ projects, theme }) {
 export default function Projects({ sky = {}, isNight: isNightProp = false }) {
     const currentMode = sky?.label || (isNightProp ? "noche" : "mediodia");
     const theme = getTheme(currentMode);
+    const isBright = currentMode === "amanecer" || currentMode === "atardecer";
 
     const isMobile = useIsMobile();
 
@@ -356,9 +359,9 @@ export default function Projects({ sky = {}, isNight: isNightProp = false }) {
             <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}}
                 style={{textAlign:"center",marginBottom:"44px",padding:"0 24px",isolation:"isolate"}}>
                 <h2 style={{
-                    fontFamily:"'DM Mono',monospace",
-                    fontSize:"clamp(1.8rem,4vw,2.6rem)",
-                    fontWeight:700, margin:0, letterSpacing:"2px",
+                    fontFamily:"'Poppins',sans-serif",
+                    fontSize:"clamp(1.8rem,4vw,2.0rem)",
+                    fontWeight:700, margin:0, letterSpacing:"clamp(4px, 2vw, 20px)", textTransform:"uppercase",
                 }}>
                     <span key={currentMode} style={{
                         background: theme.titleGradient,
@@ -381,7 +384,10 @@ export default function Projects({ sky = {}, isNight: isNightProp = false }) {
                 style={{ textAlign:"center", marginTop:isMobile?"16px":"18px",
                     fontFamily:"'Poppins',sans-serif", fontSize:"11px", fontWeight:"400",
                     letterSpacing:"2px", textTransform:"uppercase",
-                    color:theme.tagColor, textShadow:theme.dark ? "0 0 14px rgba(167,139,250,0.45)" : "none" }}>
+                    color: isBright ? "rgba(255,241,250,0.92)" : theme.tagColor,
+                    textShadow: currentMode === "mediodia" ? "0 1px 6px rgba(255,255,255,0.85)"
+                      : isBright ? "0 1px 10px rgba(76,5,40,0.45)"
+                      : "0 0 14px rgba(167,139,250,0.45)" }}>
                 {isMobile ? "✦ toca una estrella ✦" : "✦ explora las constelaciones ✦"}
             </motion.p>
         </section>

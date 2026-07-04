@@ -225,6 +225,7 @@ export default function App() {
                 {section === "sobremi" && (
                     <SobreMi
                         key="sobremi"
+                        sky= {sky}
                         isNight={isNight}
                         onBack={() => setSection("hero")}
                     />

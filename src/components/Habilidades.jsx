@@ -4,7 +4,7 @@ import { getTheme } from "../theme";
 
 const grupos = [
     {
-        categoria: "Frontend Development", glyph: "◈", color: "#6366f1",
+        categoria: "Frontend Development", glyph: "✦", color: "#6366f1",
         skills: [
             { nombre: "HTML5",           x: 12, y: 35 },
             { nombre: "CSS3",            x: 28, y: 18 },
@@ -26,7 +26,7 @@ const grupos = [
         lines: [[0,1],[1,2],[2,3],[0,3]],
     },
     {
-        categoria: "Backend & Bases de Datos", glyph: "⬡", color: "#2563eb",
+        categoria: "Backend & Bases de Datos", glyph: "✦", color: "#2563eb",
         skills: [
             { nombre: "PHP Ecosystem",         x: 20, y: 50 },
             { nombre: "MySQL / DB",            x: 52, y: 25 },
@@ -35,7 +35,7 @@ const grupos = [
         lines: [[0,1],[1,2],[0,2]],
     },
     {
-        categoria: "Herramientas & Entorno", glyph: "◎", color: "#0d9488",
+        categoria: "Herramientas & Entorno", glyph: "✦", color: "#0d9488",
         skills: [
             { nombre: "Git / GitHub",  x: 18, y: 30 },
             { nombre: "VS Code Suite", x: 48, y: 18 },
@@ -91,6 +91,16 @@ function ShootingStar({ color }) {
     );
 }
 
+// Calcula dónde abrir el tooltip para que no se salga del canvas.
+// x e y son la posición del nodo en % dentro del canvas.
+function tooltipPosition(x, y) {
+    // Vertical: si el nodo está en el tercio superior, el tooltip va abajo
+    const vertical   = y < 30 ? "bottom" : "top";
+    // Horizontal: centra por defecto; si el nodo está muy a la derecha, ancla a la derecha
+    const horizontal = x > 70 ? "right" : x < 30 ? "left" : "center";
+    return { vertical, horizontal };
+}
+
 function ConstellationGroup({ grupo, gi, currentMode }) {
     const [hoveredStar, setHoveredStar] = useState(null);
 
@@ -101,13 +111,12 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
         canvasBorder:   base.cardBorder,
         headerText:     base.headerText,
         labelText:      base.labelColor,
-        labelTextHover: base.dark ? "#ffffff" : base.headerText,
         lineColor:      `${grupo.color}${base.dark ? "20" : "30"}`,
         lineColorMain:  `${grupo.color}${base.dark ? "cc" : "95"}`,
         tooltipBg:      base.tooltipBg,
         tooltipText:    base.tooltipText,
         boxShadow:      base.canvasBoxShadow,
-        boxShadowHover: `0 0 0 1px ${grupo.color}44, ${base.canvasBoxShadow.replace(/0\.0?\d+(?=\))/, m => Math.min(parseFloat(m) + 0.06, 1).toFixed(2))}`,
+        boxShadowHover: `0 0 0 1px ${grupo.color}44, ${base.canvasBoxShadow}`,
     }), [grupo.color, base]);
 
     const isNight = currentMode === "noche";
@@ -126,11 +135,15 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                     fontFamily: "'DM Mono', monospace", fontSize: 20, color: grupo.color,
                     textShadow: isNight ? `0 0 14px ${grupo.color}` : "none",
                 }}>{grupo.glyph}</span>
+
                 <span style={{
-                    fontFamily: "'DM Mono', monospace", fontSize: "1.1rem", fontWeight: 700,
+                    fontFamily: "'Poppins', sans-serif", fontSize: "1rem", fontWeight: 700,
                     color: theme.headerText, letterSpacing: "0.8px",
-                    textShadow: isNight ? "0 0 20px rgba(167,139,250,0.4)" : "none",
+                    textShadow: isNight ? "0 0 20px rgba(167,139,250,0.4)"
+                     : currentMode === "amanecer" ? "0 1px 8px rgba(76,5,40,0.4)"
+                     : "none",
                 }}>{grupo.categoria}</span>
+
                 <div style={{
                     flex: 1, height: 1, marginLeft: 12,
                     background: `linear-gradient(to right, ${grupo.color}50, transparent)`,
@@ -140,12 +153,13 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
             {/* Panel */}
             <div
                 style={{
-                    position: "relative", width: "100%", height: "clamp(200px, 28vw, 240px)", borderRadius: 24,
+                    position: "relative", width: "100%",
+                    height: "clamp(200px, 28vw, 240px)",
+                    borderRadius: 24,
                     background: theme.canvasBg,
                     border: `1px solid ${theme.canvasBorder}`,
                     boxShadow: theme.boxShadow,
                     backdropFilter: "blur(12px)",
-                    // isolation evita que backdropFilter rompa WebkitBackgroundClip del título
                     isolation: "isolate",
                     overflow: "hidden",
                     transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -203,6 +217,47 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                 {/* Estrellas */}
                 {grupo.skills.map((skill, si) => {
                     const isHovered = hoveredStar === si;
+                    const { vertical, horizontal } = tooltipPosition(skill.x, skill.y);
+
+                    // Posición vertical del tooltip
+                    const tipTop    = vertical === "bottom" ? "calc(100% + 14px)" : "auto";
+                    const tipBottom = vertical === "top"    ? "calc(100% + 14px)" : "auto";
+
+                    // Posición horizontal del tooltip
+                    // "center" → centrado sobre el nodo (transform -50%)
+                    // "left"   → anclado a la izquierda del nodo, no se sale por la izquierda
+                    // "right"  → anclado a la derecha del nodo, no se sale por la derecha
+                    const tipStyle = (() => {
+                        if (horizontal === "left")  return { left: 0,    transform: "none" };
+                        if (horizontal === "right") return { right: 0,   transform: "none", left: "auto" };
+                        return { left: "50%", transform: "translateX(-50%)" };
+                    })();
+
+                    // La flecha del tooltip apunta siempre hacia el nodo
+                    const arrowStyle = (() => {
+                        const base = {
+                            position: "absolute", width: 8, height: 8,
+                            background: theme.tooltipBg,
+                            borderRight: `1px solid ${grupo.color}55`,
+                            transform: "rotate(45deg)",
+                        };
+                        if (vertical === "bottom") {
+                            // tooltip está abajo → flecha arriba
+                            return { ...base, top: -5, borderTop: `1px solid ${grupo.color}55`,
+                                borderRight: `1px solid ${grupo.color}55`, borderBottom: "none", borderLeft: "none",
+                                left: horizontal === "left" ? 14 : horizontal === "right" ? "auto" : "50%",
+                                right: horizontal === "right" ? 14 : "auto",
+                                marginLeft: horizontal === "center" ? -4 : 0,
+                            };
+                        }
+                        // tooltip está arriba → flecha abajo
+                        return { ...base, bottom: -5, borderBottom: `1px solid ${grupo.color}55`,
+                            borderRight: `1px solid ${grupo.color}55`, borderTop: "none", borderLeft: "none",
+                            left: horizontal === "left" ? 14 : horizontal === "right" ? "auto" : "50%",
+                            right: horizontal === "right" ? 14 : "auto",
+                            marginLeft: horizontal === "center" ? -4 : 0,
+                        };
+                    })();
 
                     return (
                         <div
@@ -214,7 +269,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                             onMouseEnter={() => setHoveredStar(si)}
                             onMouseLeave={() => setHoveredStar(null)}
                         >
-                            {/* Halo pulsante — crece más en hover */}
+                            {/* Halo pulsante */}
                             <motion.div
                                 animate={{
                                     opacity: isNight
@@ -232,7 +287,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                                 }}
                             />
 
-                            {/* Nodo — crece en hover con motion para suavidad */}
+                            {/* Nodo */}
                             <motion.div
                                 animate={{
                                     scale: isHovered ? 1.8 : 1,
@@ -251,19 +306,18 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                                 }}
                             />
 
-                            {/* Tooltip encima — aparece solo en hover */}
+                            {/* Tooltip — reposicionado según x,y del nodo */}
                             <AnimatePresence>
                                 {isHovered && (
                                     <motion.div
-                                        initial={{ opacity: 0, y: 4, scale: 0.85 }}
+                                        initial={{ opacity: 0, y: vertical === "bottom" ? -4 : 4, scale: 0.85 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 4, scale: 0.85 }}
+                                        exit={{ opacity: 0, y: vertical === "bottom" ? -4 : 4, scale: 0.85 }}
                                         transition={{ duration: 0.16 }}
                                         style={{
                                             position: "absolute",
-                                            bottom: "calc(100% + 14px)",
-                                            left: "50%",
-                                            transform: "translateX(-50%)",
+                                            top: tipTop, bottom: tipBottom,
+                                            ...tipStyle,
                                             whiteSpace: "nowrap",
                                             background: theme.tooltipBg,
                                             border: `1px solid ${grupo.color}55`,
@@ -274,30 +328,22 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                                             pointerEvents: "none", zIndex: 30,
                                         }}
                                     >
-                                        {/* Flecha hacia abajo */}
-                                        <div style={{
-                                            position: "absolute", bottom: -5, left: "50%",
-                                            transform: "translateX(-50%) rotate(45deg)",
-                                            width: 8, height: 8,
-                                            background: theme.tooltipBg,
-                                            borderRight: `1px solid ${grupo.color}55`,
-                                            borderBottom: `1px solid ${grupo.color}55`,
-                                        }} />
+                                        <div style={arrowStyle} />
                                         <span style={{
-                                            fontFamily: "'DM Mono', monospace",
+                                            fontFamily: "'Poppins', sans-serif",
                                             fontSize: "0.8rem", fontWeight: 600,
-                                            color: theme.tooltipText, letterSpacing: "0.4px",
+                                            color: theme.tooltipText, letterSpacing: "0.2px",
                                         }}>{skill.nombre}</span>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
 
-                            {/* Etiqueta fija bajo la estrella — siempre igual, sin cambios en hover */}
+                            {/* Etiqueta fija */}
                             <span style={{
                                 position: "absolute", top: "calc(100% + 8px)", left: "50%",
                                 transform: "translateX(-50%)",
-                                fontFamily: "'DM Mono', monospace", fontSize: "clamp(9px, 2.2vw, 11px)",
-                                fontWeight: 500, letterSpacing: "0.5px",
+                                fontFamily: "'Poppins', sans-serif", fontSize: "clamp(9px, 2.2vw, 11px)",
+                                fontWeight: 600, letterSpacing: "0.2px",
                                 color: theme.labelText,
                                 whiteSpace: "nowrap", pointerEvents: "none",
                             }}>{skill.nombre}</span>
@@ -313,17 +359,16 @@ export default function Habilidades({ sky = {} }) {
     const currentMode = sky?.label || "mediodia";
     const isNight = currentMode === "noche";
     const theme = getTheme(currentMode);
+    const isBright = currentMode === "amanecer" || currentMode === "atardecer";
 
     return (
         <section id="habilidades" style={{
             position: "relative", width: "100%", padding: "120px 24px",
             background: "transparent", overflow: "hidden",
-            // isolation aquí también protege el título con clip-text
             isolation: "isolate",
         }}>
             <div style={{ maxWidth: 960, margin: "0 auto" }}>
 
-                {/* Título — isolation en el wrapper evita el bug de backdropFilter */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -331,20 +376,19 @@ export default function Habilidades({ sky = {} }) {
                     style={{ textAlign: "center", marginBottom: 70, isolation: "isolate" }}
                 >
                     <h2 style={{
-                        fontFamily: "'DM Mono', monospace",
-                        fontSize: "clamp(1.8rem, 4vw, 2.6rem)",
-                        fontWeight: 700, margin: "0 0 14px 0", letterSpacing: "2px",
-                    }}>
-                        <span
-                            key={currentMode}
-                            style={{
-                                background: theme.titleGradient,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                                backgroundClip: "text",
-                                display: "inline-block",
-                            }}
-                        >
+                        fontFamily: "'Poppins',sans-serif",
+                        fontSize: "clamp(1.8rem, 4vw, 2.0rem)",
+                        fontWeight: 700, margin: "0 0 14px 0",
+                        letterSpacing: "clamp(4px, 2vw, 20px)",
+                        textTransform: "uppercase",
+            }}>
+                        <span key={currentMode} style={{
+                            background: theme.titleGradient,
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                            display: "inline-block",
+                        }}>
                             Mis habilidades técnicas
                         </span>
                     </h2>
@@ -373,7 +417,10 @@ export default function Habilidades({ sky = {} }) {
                         textAlign: "center", marginTop: 54,
                         fontFamily: "'DM Mono', monospace",
                         fontSize: "11px", letterSpacing: "3px", textTransform: "uppercase",
-                        color: theme.subtitleColor,
+                        color: isBright ? "rgba(255,241,250,0.92)" : theme.subtitleColor,
+                        textShadow: currentMode === "mediodia" ? "0 1px 6px rgba(255,255,255,0.85)" 
+                        : isBright ? "0 1px 10px rgba(76,5,40,0.45)"
+                        : "0 0 14px rgba(167,139,250,0.5)",
                     }}
                 >
                     ✦ explora las estrellas para descubrir detalles · learning everyday ✦
@@ -381,16 +428,13 @@ export default function Habilidades({ sky = {} }) {
             </div>
 
             <style>{`
-
                 @media (max-width: 768px) {
                     .habilidades-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
                 }
                 @media (max-width: 380px) {
                     .habilidades-grid { gap: 14px !important; }
                 }
-
-            `}
-            </style>
+            `}</style>
         </section>
     );
 }

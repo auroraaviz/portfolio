@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const highlights = [
     { glyph: "✦", label: "Diseño propio", desc: "Logotipos, branding e interfaces desde cero", color: "#ec4899" },
-    { glyph: "◈", label: "Frontend",       desc: "HTML, CSS, JS, Bootstrap 5, React",          color: "#8b5cf6" },
-    { glyph: "⬡", label: "Fullstack",      desc: "PHP, MySQL, API REST, Git",                   color: "#3b82f6" },
-    { glyph: "◎", label: "Disponible",     desc: "Almería · híbrido · remoto",                  color: "#14b8a6" },
+    { glyph: "✦", label: "Frontend",       desc: "HTML, CSS, JS, Bootstrap 5, React",          color: "#8b5cf6" },
+    { glyph: "✦", label: "Fullstack",      desc: "PHP, MySQL, API REST, Git",                   color: "#3b82f6" },
+    { glyph: "✦", label: "Disponible",     desc: "Almería · híbrido · remoto",                  color: "#14b8a6" },
 ];
 
 // Posiciones desktop (espacio más ancho, paneles laterales caben bien)
@@ -39,26 +39,49 @@ function useIsMobile() {
 
 const CONSTELLATION_LINES = [[0,1],[1,2],[2,3],[3,4],[4,0],[1,3]];
 
-function AboutText({ isNight }) {
-    const textColor  = isNight ? "rgba(218,198,255,0.90)" : "rgba(15,2,55,0.88)";
-    const bodyColor  = isNight ? "rgba(218,198,255,0.82)" : "rgba(35,8,90,0.80)";
-    const labelColor = isNight ? "rgba(196,165,253,0.50)" : "rgba(80,15,170,0.55)";
-    const strongColor= isNight ? "#e9d5ff"                : "rgba(80,10,180,0.95)";
+function AboutText({ currentMode, isBright }) {
+    const isNight = currentMode === "noche";
 
+    const textColor   = isNight ? "rgba(218,198,255,0.90)"
+                       : isBright ? "rgba(255,248,251,0.95)"
+                       : "rgba(15,2,55,0.88)";
+    const bodyColor   = isNight ? "rgba(218,198,255,0.82)"
+                       : isBright ? "rgba(255,248,251,0.88)"
+                       : "rgba(35,8,90,0.80)";
+    const strongColor = isNight ? "#e9d5ff"
+                       : isBright ? "#fff2f8"
+                       : "rgba(80,10,180,0.95)";
+    const paragraphShadow = isBright ? "0 1px 10px rgba(30,4,40,0.55)" : "none";
+
+    // Píldora: cristal oscuro en noche, cristal claro en el resto
+    // cristal claro más suave en amanecer/atardecer 
+    const pillBg     = isNight ? "rgba(10,2,24,0.45)" : isBright ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.4)";
+    const pillBorder = isNight ? "1px solid rgba(255,255,255,0.14)" : isBright ? "1px solid rgba(255,255,255,0.32)" : "1px solid rgba(255,255,255,0.55)";
+    const pillText   = isNight ? "rgba(255,250,255,0.95)" : isBright ? "rgba(255,248,251,0.95)" : "rgba(46,10,70,0.88)";
+    
     return (
         <div style={{ textAlign:"center", width:"min(420px,88vw)" }}>
             <p style={{
+                display: "inline-block",
                 fontFamily:"'DM Mono',monospace",
-                fontSize:"clamp(8px,1.2vw,10px)",
+                fontSize:"clamp(9px,1.3vw,11px)",
                 letterSpacing:"3px", textTransform:"uppercase",
-                color: labelColor, margin:"0 0 14px",
+                color: pillText,
+                textShadow: isBright ? "0 1px 6px rgba(30,4,25,0.6)" : "none",
+                background: pillBg,
+                backdropFilter: "blur(6px)",
+                border: pillBorder,
+                borderRadius: "20px",
+                padding: "6px 16px",
+                margin:"0 0 14px",
             }}>
-                ✦ desarrolladora web · almería
+            ✦ desarrolladora web · almería
             </p>
             <p style={{
                 fontFamily:"'Poppins',sans-serif",
-                fontSize:"clamp(0.82rem,1.5vw,0.94rem)",
+                fontSize:"clamp(0.82rem,2.5vw,0.94rem)",
                 fontWeight:500, color: textColor,
+                textShadow: paragraphShadow,
                 lineHeight:1.78, margin:"0 0 10px",
             }}>
                 Recién graduada en DAW con experiencia real. Durante mis prácticas en{" "}
@@ -69,8 +92,9 @@ function AboutText({ isNight }) {
             </p>
             <p style={{
                 fontFamily:"'Poppins',sans-serif",
-                fontSize:"clamp(0.82rem,1.5vw,0.94rem)",
+                fontSize:"clamp(0.82rem,2.5vw,0.94rem)",
                 fontWeight:400, color: bodyColor,
+                textShadow: paragraphShadow,
                 lineHeight:1.78, margin:0,
             }}>
                 Me especializo en{" "}
@@ -132,7 +156,7 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
                 {hover && !isOpen && (
                     <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
                         style={{ position:"absolute", bottom:"calc(100% + 9px)", left:"50%", transform:"translateX(-50%)", whiteSpace:"nowrap", pointerEvents:"none", zIndex:10 }}>
-                        <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, fontWeight:700, color: tooltipClr, textShadow:`0 0 12px ${highlight.color}` }}>{highlight.label}</span>
+                        <span style={{ fontFamily:"'Poppins',sans-serif", fontSize:11, fontWeight:700, color: tooltipClr, textShadow:`0 0 12px ${highlight.color}` }}>{highlight.label}</span>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -153,7 +177,7 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
                         <div style={{ position:"absolute", top:0, left:"15%", right:"15%", height:1, background:`linear-gradient(to right,transparent,${highlight.color}88,transparent)` }} />
                         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6, textAlign:"center" }}>
                             <span style={{ fontFamily:"'DM Mono',monospace", fontSize:20, color:highlight.color, textShadow:`0 0 14px ${highlight.color}` }}>{highlight.glyph}</span>
-                            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.86rem", fontWeight:700, color: labelClr }}>{highlight.label}</span>
+                            <span style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.86rem", fontWeight:700, color: labelClr }}>{highlight.label}</span>
                             <p style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.73rem", color: descClr, lineHeight:1.6, margin:0 }}>{highlight.desc}</p>
                         </div>
                     </motion.div>
@@ -163,16 +187,19 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
     );
 }
 
-export default function SobreMi({ isNight = false, onBack }) {
+export default function SobreMi({ sky = {}, isNight: isNightProp = false, onBack }) {
     const [openStar, setOpenStar] = useState(null);
     const isMobile = useIsMobile();
     const STAR_POSITIONS = isMobile ? STAR_POSITIONS_MOBILE : STAR_POSITIONS_DESKTOP;
     const lineDelays = [0, 0.25, 0.5, 0.75, 1.0, 1.25];
 
-    const lineHalo  = isNight ? "rgba(167,139,250,0.10)" : "rgba(80,40,180,0.12)";
-    const lineMain  = isNight ? "rgba(196,165,253,0.40)" : "rgba(100,50,200,0.30)";
-    const labelTop  = isNight ? "rgba(233,213,255,0.60)" : "rgba(30,5,80,0.55)";
-    const hintClr   = isNight ? "rgba(233,213,255,0.30)" : "rgba(30,5,80,0.35)";
+    const currentMode = sky?.label || (isNightProp ? "noche" : "mediodia");
+    const isNight  = currentMode === "noche";
+    const isBright = currentMode === "amanecer" || currentMode === "atardecer";
+
+    const lineHalo  = isNight ? "rgba(167,139,250,0.10)" : isBright ? "rgba(30,4,25,0.18)" : "rgba(80,40,180,0.12)";
+    const lineMain  = isNight ? "rgba(196,165,253,0.40)" : isBright ? "rgba(255,255,255,0.7)"  : "rgba(100,50,200,0.30)";
+    const labelTop  = isNight ? "rgba(233,213,255,0.60)" : isBright ? "rgba(255,246,250,0.9)" : "rgba(30,5,80,0.55)";
     const backBg    = isNight ? "rgba(5,1,18,0.65)"      : "rgba(255,255,255,0.55)";
     const backBorder= isNight ? "rgba(167,139,250,0.35)"  : "rgba(100,50,200,0.3)";
     const backColor = isNight ? "rgba(233,213,255,0.85)"  : "rgba(30,5,80,0.85)";
@@ -225,11 +252,11 @@ export default function SobreMi({ isNight = false, onBack }) {
                         left: "50%",
                         transform: "translateX(-50%)",
                         fontFamily: "'DM Mono',monospace",
-                        fontSize: 10,
+                        fontSize: 13,
                         letterSpacing: "4px",
                         textTransform: "uppercase",
                         color: labelTop,
-                        textShadow: isNight ? "0 0 18px rgba(167,139,250,0.5)" : "none",
+                        textShadow: isNight ? "0 0 18px rgba(167,139,250,0.5)" : isBright ? "0 1px 8px rgba(30,4,40,0.5)" : "none",
                         pointerEvents: "none",
                         whiteSpace: "nowrap",
                         zIndex: 150,
@@ -243,7 +270,7 @@ export default function SobreMi({ isNight = false, onBack }) {
 
                     {/* Texto descriptivo */}
                     <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3, duration:0.55 }} style={{ marginBottom:48, zIndex:6 }}>
-                        <AboutText isNight={isNight} />
+                        <AboutText currentMode={currentMode} isBright={isBright} />
                     </motion.div>
 
                     {/* Canvas constelación */}
@@ -298,9 +325,20 @@ export default function SobreMi({ isNight = false, onBack }) {
                     </div>
 
                     <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.2 }}
-                        style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:"3px", textTransform:"uppercase", color: hintClr, margin:"24px 0 0", pointerEvents:"none" }}>
-                        ✦ pulsa las estrellas para descubrir más ✦
-                    </motion.p>
+                        style={{
+                            display: "inline-block",
+                            fontFamily:"'DM Mono',monospace", fontSize: 10, letterSpacing:"3px", textTransform:"uppercase",
+                            color: isNight ? "rgba(255,250,255,0.9)" : isBright ? "rgba(255,248,251,0.95)" : "rgba(46,10,70,0.85)",
+                            textShadow: isBright ? "0 1px 6px rgba(30,4,25,0.6)" : "none",
+                            background: isNight ? "rgba(10,2,24,0.4)" : isBright ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.38)",
+                            backdropFilter: "blur(6px)",
+                            border: isNight ? "1px solid rgba(255,255,255,0.1)" : isBright ? "1px solid rgba(255,255,255,0.3)" : "1px solid rgba(255,255,255,0.5)",
+                            borderRadius: "20px",
+                            padding: "6px 14px",
+                            margin:"24px 0 0", pointerEvents:"none",
+                         }}>
+                                ✦ pulsa las estrellas para descubrir más ✦
+                </motion.p>
                 </div>
             </motion.div>
         </>
