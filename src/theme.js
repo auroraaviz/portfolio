@@ -73,7 +73,7 @@ export const THEMES = {
     },
     mediodia: {
         dark: false,
-        titleGradient: "linear-gradient(to right, #1e1b4b, rgba(99,102,241,0.9))",
+        titleGradient: "linear-gradient(to right, #8e54f3, #78d1c9)",
         lineGlow:     "rgba(99,102,241,0.1)",
         lineGlowMain: "rgba(99,102,241,0.08)",
         lineCore:     "rgba(99,102,241,0.4)",

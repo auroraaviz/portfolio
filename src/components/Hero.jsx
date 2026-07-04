@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
+const SKY_ACCENTS = {
+    amanecer:  "#f9a8d4",
+    mediodia:  "#a5b4fc",
+    atardecer: "#5eead4",
+    noche:     "#c4b5fd",
+};
+
 export default function Hero({ sky = {}, onNameClick }) {
     const [hoverBtn, setHoverBtn]   = useState(false);
     const [scrolled, setScrolled]   = useState(false);
     const [hoverName, setHoverName] = useState(false);
     const [clicked, setClicked]     = useState(false);
+    const accent = SKY_ACCENTS[sky?.label] || SKY_ACCENTS.noche;
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 60);
@@ -31,16 +39,32 @@ export default function Hero({ sky = {}, onNameClick }) {
 
                 <motion.p
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                    style={{ fontFamily: "'DM Mono',monospace", fontSize: "11px", letterSpacing: "5px", color: "#e9d5ff", marginBottom: "14px", textTransform: "uppercase", textShadow: "0 0 20px rgba(167,139,250,0.8),0 1px 3px rgba(0,0,0,0.6)" }}
+                    style={{
+                        fontFamily: "'DM Mono',monospace", fontSize: "11px", letterSpacing: "5px",
+                        color: "#e9d5ff", marginBottom: "14px", textTransform: "uppercase",
+                        textShadow: `0 0 20px ${accent}cc,0 1px 3px rgba(0,0,0,0.6)`,
+                    }}
                 >
-                    Desarrolladora Web
+                    Trazando interfaces
                 </motion.p>
 
                 <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={clicked
                         ? { opacity: 0, scale: 1.18, filter: "blur(12px)" }
-                        : { opacity: 1, y: 0, scale: hoverName ? 1.035 : 1, filter: "blur(0px)" }
+                        : { opacity: 1, y: 0, scale: hoverName ? 1.035 : 1,
+                            filter: hoverName
+                                ? [
+                                    "blur(0px)",
+                                    "drop-shadow(0 2px 10px rgba(196,165,253,0.6))",
+                                    `drop-shadow(0 0 18px ${accent}88)`,
+                                  ].join(" ")
+                                : [
+                                    "blur(0px)",
+                                    "drop-shadow(0 2px 6px rgba(167,139,250,0.4))",
+                                    `drop-shadow(0 0 10px ${accent}55)`,
+                                  ].join(" ")
+                          }
                     }
                     transition={clicked
                         ? { duration: 0.42, ease: [0.4, 0, 0.2, 1] }
@@ -50,20 +74,28 @@ export default function Hero({ sky = {}, onNameClick }) {
                     onMouseEnter={() => setHoverName(true)}
                     onMouseLeave={() => setHoverName(false)}
                     style={{
-                        fontSize: "clamp(3rem,9vw,6rem)", fontWeight: "700", color: "#ffffff",
+                        fontSize: "clamp(3rem,9vw,6rem)",
                         lineHeight: 1.05, marginBottom: "10px",
-                         fontFamily: "'Syncopate', sans-serif",
-                         fontWeight: "400",
-                         textTransform: "uppercase",
-                         letterSpacing: hoverName ? "9px" : "3px",
-                         textShadow: hoverName
-                            ? "0 2px 40px rgba(196,165,253,0.85),0 0 80px rgba(139,92,246,0.55),0 0 120px rgba(167,139,250,0.3)"
-                            : "0 2px 30px rgba(167,139,250,0.5),0 0 60px rgba(139,92,246,0.3)",
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontWeight: "400",
+                        textTransform: "uppercase",
+                        letterSpacing: hoverName ? "9px" : "3px",
                         cursor: "pointer", userSelect: "none",
-                        transition: "letter-spacing 0.45s cubic-bezier(0.25,0.46,0.45,0.94), text-shadow 0.35s ease",
+                        transition: "letter-spacing 0.45s cubic-bezier(0.25,0.46,0.45,0.94)",
                     }}
                 >
-                    Aurora Ávila
+                    <span style={{
+                        display: "inline-block",
+                        backgroundImage: `linear-gradient(135deg, #ffffff 55%, ${accent} 130%)`,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                        transform: "translateZ(0)",
+                        willChange: "transform",
+                        isolation: "isolate",
+                    }}>
+                        Aurora Ávila
+                    </span>
                 </motion.h1>
 
                 <p
@@ -109,7 +141,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                             display: "inline-flex", alignItems: "center", gap: "8px",
                             padding: "11px clamp(22px, 6vw, 38px)",
                             borderRadius: "40px",
-                            border: `1px solid rgba(233,213,255,${hoverBtn ? "0.55" : "0.28"})`,
+                            border: hoverBtn ? `1px solid ${accent}88` : "1px solid rgba(233,213,255,0.28)",
                             background: hoverBtn
                                 ? "rgba(139,92,246,0.22)"
                                 : "rgba(139,92,246,0.08)",
@@ -121,7 +153,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                             letterSpacing: "3px", textTransform: "uppercase",
                             transition: "all 0.4s ease",
                             boxShadow: hoverBtn
-                                ? "0 0 32px rgba(139,92,246,0.25), inset 0 1px 0 rgba(255,255,255,0.1)"
+                                ? `0 0 32px ${accent}44, inset 0 1px 0 rgba(255,255,255,0.1)`
                                 : "inset 0 1px 0 rgba(255,255,255,0.06)",
                         }}
                     >
@@ -146,7 +178,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                 <span style={{ fontFamily: "'DM Mono',monospace", fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase", color: "rgba(233,213,255,0.55)" }}>scroll</span>
                 <div style={{ width: "1px", height: "32px", background: "rgba(196,165,253,0.25)", position: "relative", overflow: "hidden" }}>
                     <motion.div animate={{ y: ["-100%","200%"] }} transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-                        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "50%", background: "rgba(233,213,255,0.9)" }} />
+                        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "50%", background: accent }} />
                 </div>
             </motion.div>
         </div>

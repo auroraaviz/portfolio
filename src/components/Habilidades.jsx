@@ -423,7 +423,7 @@ export default function Habilidades({ sky = {} }) {
                         : "0 0 14px rgba(167,139,250,0.5)",
                     }}
                 >
-                    ✦ explora las estrellas para descubrir detalles · learning everyday ✦
+                    ✦ explora las estrellas para descubrir detalles · aprendiendo cada día ✦
                 </motion.p>
             </div>
 
