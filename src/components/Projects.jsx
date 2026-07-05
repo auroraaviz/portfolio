@@ -50,9 +50,27 @@ const projects = [
         starX: 67, starY: 70,
         mobileStarX: 60, mobileStarY: 74,
     },
+    {
+        id: 5, number: "06", name: "Organizador de Proyectos",
+        description: "Aplicación Spring Boot para gestionar proyectos académicos de gran envergadura organizados por fases. Backend puro con persistencia de datos.",
+        stack: ["Java", "Spring Boot", "MySQL", "API REST"],
+        github: "https://github.com/auroraaviz/Organizador_de_proyectos",
+        demo: null, tag: "Backend",
+        starX: 42, starY: 90,
+        mobileStarX: 35, mobileStarY: 93,
+    },
+    {
+        id: 6, number: "07", name: "Tareando",
+        description: "Gestor de tareas construido con Spring Boot: crear, editar, marcar y eliminar. Proyecto educativo centrado en API REST y conexión con MySQL.",
+        stack: ["Java", "Spring Boot", "MySQL", "API REST"],
+        github: "https://github.com/auroraaviz/tareando",
+        demo: null, tag: "Backend",
+        starX: 72, starY: 88,
+        mobileStarX: 55, mobileStarY: 92,
+    },
 ];
 
-const constellationLines = [[0,1],[1,2],[2,4],[0,3],[3,4],[1,3]];
+const constellationLines = [[0,1],[1,2],[2,4],[0,3],[3,4],[1,3],[3,5],[5,6],[4,6]];
 
 const stackColorsLight = {
     "PHP":        { bg:"rgba(109,40,217,0.18)", border:"rgba(139,92,246,0.5)",  text:"rgba(55,8,130,0.95)" },
@@ -61,6 +79,9 @@ const stackColorsLight = {
     "Bootstrap":  { bg:"rgba(109,40,217,0.14)", border:"rgba(139,92,246,0.4)",  text:"rgba(55,8,130,0.9)"  },
     "HTML5":      { bg:"rgba(154,52,18,0.14)",  border:"rgba(234,88,12,0.4)",   text:"rgba(115,38,0,0.95)" },
     "CSS3":       { bg:"rgba(3,105,161,0.14)",  border:"rgba(14,165,233,0.4)",  text:"rgba(4,65,115,0.95)" },
+    "Java":       { bg:"rgba(180,83,9,0.16)",   border:"rgba(217,119,6,0.45)",  text:"rgba(120,53,15,0.95)" },
+    "Spring Boot":{ bg:"rgba(21,128,61,0.15)",  border:"rgba(34,197,94,0.45)",  text:"rgba(15,80,40,0.95)"  },
+    "API REST":   { bg:"rgba(15,118,110,0.14)", border:"rgba(20,184,166,0.4)",  text:"rgba(8,70,65,0.95)"   },
 };
 
 function useIsMobile() {
@@ -119,7 +140,7 @@ function StackPill({ tech, dark }) {
         <span style={{
             padding:"3px 10px", borderRadius:"20px",
             background:c.bg, border:`1px solid ${c.border}`,
-            fontFamily:"'DM Mono',monospace", fontSize:"9px", fontWeight:"500",
+            fontFamily:"'DM Mono',monospace", fontSize:"10px", fontWeight:"500",
             color:c.text, letterSpacing:"0.2px", display:"inline-block",
         }}>{tech}</span>
     );
@@ -137,12 +158,12 @@ function ProjectContent({ project, theme }) {
     return (
         <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
             <div style={{ display:"flex", alignItems:"baseline", gap:"6px" }}>
-                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"10px", color:numberColor, flexShrink:0 }}>{project.number}</span>
+                <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"20px", color:numberColor, flexShrink:0 }}>{project.number}</span>
                 <span style={{ fontFamily:"'Poppins',sans-serif", letterSpacing:"1px", fontSize:"1rem", fontWeight:"700", color:nameColor, lineHeight:1.2 }}>{project.name}</span>
 
 
             </div>
-            <p style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.73rem", color:descColor, lineHeight:1.65, margin:0 }}>
+            <p style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.83rem", color:descColor, lineHeight:1.65, margin:0 }}>
                 {project.description}
             </p>
             <div style={{ display:"flex", flexWrap:"wrap", gap:"4px" }}>
@@ -301,6 +322,12 @@ function MobileConstellation({ projects, theme }) {
                     </svg>
                     {projects.map(project => {
                         const isOpen=openId===project.id, isHover=hoverId===project.id, sz=isOpen||isHover?16:9;
+                        const hAnchor = project.mobileStarX < 28 ? "left" : project.mobileStarX > 72 ? "right" : "center";
+                        const hStyle = hAnchor === "left"
+                            ? { left: 0, right: "auto", transform: "none", textAlign: "left" }
+                            : hAnchor === "right"
+                            ? { right: 0, left: "auto", transform: "none", textAlign: "right" }
+                            : { left: "50%", right: "auto", transform: "translateX(-50%)", textAlign: "center" };
                         return (
                             <div key={project.id} style={{ position:"absolute", left:`${project.mobileStarX}%`, top:`${project.mobileStarY}%`, transform:"translate(-50%,-50%)", zIndex:isOpen?20:5 }}>
                                 <motion.div animate={{opacity:[0.15,0.4,0.15],scale:[0.9,1.2,0.9]}}
@@ -318,8 +345,15 @@ function MobileConstellation({ projects, theme }) {
                                 <AnimatePresence>
                                     {(isHover||isOpen)&&(
                                         <motion.div initial={{opacity:0,y:4}} animate={{opacity:1,y:0}} exit={{opacity:0,y:2}}
-                                            style={{ position:"absolute", bottom:project.mobileStarY<20?"auto":"calc(100% + 10px)", top:project.mobileStarY<20?"calc(100% + 10px)":"auto",
-                                                left:"50%",transform:"translateX(-50%)",whiteSpace:"nowrap",textAlign:"center",pointerEvents:"none",zIndex:10 }}>
+                                            style={{
+                                                position:"absolute",
+                                                bottom:project.mobileStarY<20?"auto":"calc(100% + 10px)",
+                                                top:project.mobileStarY<20?"calc(100% + 10px)":"auto",
+                                                ...hStyle,
+                                                maxWidth: 140,
+                                                whiteSpace:"normal",
+                                                pointerEvents:"none", zIndex:10,
+                                            }}>
                                             <span style={{display:"block",fontFamily:"'DM Mono',monospace",letterSpacing:"2px",fontSize:"13px",fontWeight:"700",color:theme.nameColor,textShadow:theme.nameShadow}}>{project.name}</span>
                                             <span style={{display:"block",fontFamily:"'DM Mono',monospace",fontSize:"8px",color:theme.tagColor,letterSpacing:"1.5px",textTransform:"uppercase",marginTop:"2px"}}>{project.tag}</span>
                                         </motion.div>

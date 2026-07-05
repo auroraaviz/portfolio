@@ -88,7 +88,7 @@ export const THEMES = {
         tagColor:   "rgba(67,56,202,0.8)",
         labelColor: "rgba(30,27,75,0.55)",
         valueColor: "rgba(20,5,80,0.9)",
-        headerText: "#1e1b4b",
+        headerText: "#e1d8f0", 
         subtitleColor: "rgba(30,27,75,0.65)",
         footerColor:   "rgba(30,27,75,0.48)",
         panelBg:       "rgba(248,249,255,0.96)",

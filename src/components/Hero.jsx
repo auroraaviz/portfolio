@@ -45,7 +45,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                         textShadow: `0 0 20px ${accent}cc,0 1px 3px rgba(0,0,0,0.6)`,
                     }}
                 >
-                    Trazando interfaces
+                    Desarrollo Web
                 </motion.p>
 
                 <motion.h1

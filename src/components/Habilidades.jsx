@@ -141,6 +141,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                     color: theme.headerText, letterSpacing: "0.8px",
                     textShadow: isNight ? "0 0 20px rgba(167,139,250,0.4)"
                      : currentMode === "amanecer" ? "0 1px 8px rgba(76,5,40,0.4)"
+                     : currentMode === "mediodia" ? "0 1px 6px rgba(30,27,75,0.55), 0 0 12px rgba(124,58,237,0.25)"
                      : "none",
                 }}>{grupo.categoria}</span>
 

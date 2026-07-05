@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getTheme } from "../theme";
 
 const highlights = [
     { glyph: "✦", label: "Diseño propio", desc: "Logotipos, branding e interfaces desde cero", color: "#ec4899" },
@@ -105,9 +106,13 @@ function AboutText({ currentMode, isBright }) {
     );
 }
 
-function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, isMobile }) {
+const HALO_AMPLITUDES = [1.22, 1.32, 1.16, 1.26];
+
+function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, isMobile, currentMode, index }) {
     const [hover, setHover] = useState(false);
     const sz = hover || isOpen ? 16 : 9;
+    const theme = getTheme(currentMode);
+    const haloAmp = HALO_AMPLITUDES[index % HALO_AMPLITUDES.length];
 
     const starBg     = isNight
         ? `radial-gradient(circle at 35% 35%,#ffffff,${highlight.color}cc)`
@@ -118,22 +123,24 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
         : `0 0 6px 2px ${highlight.color}55,0 0 14px 4px ${highlight.color}22`;
     const haloOpacity = isNight ? [0.12,0.38,0.12] : [0.08,0.28,0.08];
 
-    const panelLeft   = pos.x < 50 ? "0" : "auto";
-    const panelRight  = pos.x >= 50 ? "0" : "auto";
-    const panelBottom = pos.y < 50 ? "auto" : "calc(100% + 12px)";
-    const panelTop    = pos.y < 50 ? "calc(100% + 12px)" : "auto";
+    const anchorLeft  = pos.x < 50;
+    const anchorBelow = pos.y < 50;
 
-    const panelBg     = isNight ? "rgba(5,1,18,0.94)"        : "rgba(255,255,255,0.96)";
-    const panelBorder = isNight ? `1px solid ${highlight.color}44` : `1px solid ${highlight.color}55`;
-    const labelClr    = isNight ? "#fff"                       : "rgba(20,4,70,0.95)";
-    const descClr     = isNight ? "rgba(220,200,255,0.82)"     : "rgba(45,8,100,0.78)";
-    const tooltipClr  = isNight ? "#f5f0ff"                    : "rgba(20,4,70,0.92)";
+    const panelLeft   = anchorLeft ? "0" : "auto";
+    const panelRight  = !anchorLeft ? "0" : "auto";
+    const panelBottom = anchorBelow ? "auto" : "calc(100% + 14px)";
+    const panelTop    = anchorBelow ? "calc(100% + 14px)" : "auto";
+
+    const panelBg     = theme.panelBg;
+    const labelClr    = isNight ? "#fff" : "rgba(20,4,70,0.95)";
+    const descClr     = isNight ? "rgba(220,200,255,0.82)" : "rgba(45,8,100,0.78)";
+    const tooltipClr  = isNight ? "#f5f0ff" : "rgba(20,4,70,0.92)";
 
     return (
         <div style={{ position:"absolute", left:`${pos.x}%`, top:`${pos.y}%`, transform:"translate(-50%,-50%)", zIndex: isOpen ? 40 : 10 }}>
             {/* Halo */}
             <motion.div
-                animate={{ opacity: haloOpacity, scale:[0.88,1.18,0.88] }}
+                animate={{ opacity: haloOpacity, scale:[0.88, haloAmp, 0.88] }}
                 transition={{ duration:3.2+delay, repeat:Infinity, ease:"easeInOut" }}
                 style={{ position:"absolute", top:"50%", left:"50%", width:48, height:48, transform:"translate(-50%,-50%)", borderRadius:"50%", background:`radial-gradient(circle,${highlight.color}50 0%,transparent 70%)`, pointerEvents:"none" }}
             />
@@ -154,31 +161,66 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
             {/* Tooltip nombre */}
             <AnimatePresence>
                 {hover && !isOpen && (
-                    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-                        style={{ position:"absolute", bottom:"calc(100% + 9px)", left:"50%", transform:"translateX(-50%)", whiteSpace:"nowrap", pointerEvents:"none", zIndex:10 }}>
-                        <span style={{ fontFamily:"'Poppins',sans-serif", fontSize:11, fontWeight:700, color: tooltipClr, textShadow:`0 0 12px ${highlight.color}` }}>{highlight.label}</span>
+                    <motion.div initial={{ opacity:0, y:4 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
+                        style={{
+                            position:"absolute", bottom:"calc(100% + 10px)", left:"50%", transform:"translateX(-50%)",
+                            whiteSpace:"nowrap", pointerEvents:"none", zIndex:10,
+                            background: panelBg, backdropFilter:"blur(12px)",
+                            border: `1px solid ${highlight.color}50`,
+                            borderRadius:"14px", padding:"6px 14px",
+                            boxShadow:`0 6px 20px -6px ${highlight.color}40`,
+                        }}>
+                        <span style={{ fontFamily:"'Poppins',sans-serif", fontSize:14, fontWeight:700, color: tooltipClr }}>{highlight.label}</span>
                     </motion.div>
                 )}
             </AnimatePresence>
-            {/* Panel info */}
+            {/* Panel info — tarjeta con identidad de color fuerte */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity:0, scale:0.88, y:6 }} animate={{ opacity:1, scale:1, y:0 }} exit={{ opacity:0, scale:0.9 }}
+                        initial={{ opacity:0, scale:0.8, rotate:-4, y:10 }}
+                        animate={{ opacity:1, scale:1, rotate:0, y:0 }}
+                        exit={{ opacity:0, scale:0.85, y:6 }}
+                        transition={{ type:"spring", stiffness:380, damping:24 }}
                         onClick={e => e.stopPropagation()}
                         style={{
                             position:"absolute", top:panelTop, bottom:panelBottom, left:panelLeft, right:panelRight,
-                            width: isMobile ? "min(168px,52vw)" : "min(200px,56vw)",
+                            width: isMobile ? "min(200px,60vw)" : "min(230px,62vw)",
                             background: panelBg, backdropFilter:"blur(28px)",
-                            border: panelBorder, borderRadius:14, padding: isMobile ? 11 : 13,
-                            boxShadow:`0 10px 36px ${highlight.color}30`, zIndex:30,
+                            border: `1.5px solid ${highlight.color}70`,
+                            borderRadius:18,
+                            overflow: "hidden",
+                            boxShadow:`0 16px 44px ${highlight.color}45`,
+                            zIndex:30,
                         }}
                     >
-                        <div style={{ position:"absolute", top:0, left:"15%", right:"15%", height:1, background:`linear-gradient(to right,transparent,${highlight.color}88,transparent)` }} />
-                        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6, textAlign:"center" }}>
-                            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:20, color:highlight.color, textShadow:`0 0 14px ${highlight.color}` }}>{highlight.glyph}</span>
-                            <span style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.86rem", fontWeight:700, color: labelClr }}>{highlight.label}</span>
-                            <p style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.73rem", color: descClr, lineHeight:1.6, margin:0 }}>{highlight.desc}</p>
+
+                        {/* Botón cerrar — círculo real */}
+                        <button
+                            onClick={onToggle}
+                            aria-label="Cerrar"
+                            style={{
+                                position:"absolute", top:14, right:12,
+                                width:22, height:22, borderRadius:"50%",
+                                background: `${highlight.color}18`,
+                                border: `1px solid ${highlight.color}50`,
+                                cursor:"pointer",
+                                display:"flex", alignItems:"center", justifyContent:"center",
+                                fontFamily:"'Poppins',sans-serif", fontSize:13, lineHeight:1,
+                                color: highlight.color, padding:0, zIndex:2,
+                            }}
+                        >×</button>
+
+                        <div style={{ padding: isMobile ? "18px 16px 16px" : "20px 18px 18px", display:"flex", flexDirection:"column", alignItems:"center", gap:8, textAlign:"center" }}>
+                    
+                            <motion.span
+                                initial={{ opacity:0, y:4 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.15, duration:0.3 }}
+                                style={{ fontFamily:"'Poppins',sans-serif", fontSize:"1.05rem", fontWeight:700, color: labelClr, letterSpacing:"0.2px" }}
+                            >{highlight.label}</motion.span>
+                            <motion.p
+                                initial={{ opacity:0, y:4 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22, duration:0.3 }}
+                                style={{ fontFamily:"'Poppins',sans-serif", fontSize:"0.85rem", color: descClr, lineHeight:1.65, margin:0 }}
+                            >{highlight.desc}</motion.p>
                         </div>
                     </motion.div>
                 )}
@@ -307,6 +349,8 @@ export default function SobreMi({ sky = {}, isNight: isNightProp = false, onBack
                                 isOpen={openStar === i}
                                 isNight={isNight}
                                 isMobile={isMobile}
+                                currentMode={currentMode}
+                                index={i}
                                 onToggle={() => setOpenStar(prev => prev === i ? null : i)}
                             />
                         ))}
