@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Hero        from './components/Hero'
 import Projects    from './components/Projects'
@@ -24,6 +24,17 @@ const getInitialMode = () => {
     if (hour >= 19 && hour < 22) return "atardecer";
     return "noche";
 };
+
+// Detecta móvil una vez y escucha resize, igual que en tus otros componentes
+function useIsMobile() {
+    const [v, setV] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
+    useEffect(() => {
+        const h = () => setV(window.innerWidth < 768);
+        window.addEventListener("resize", h);
+        return () => window.removeEventListener("resize", h);
+    }, []);
+    return v;
+}
 
 // Genera el campo de estrellas de fondo (solo visible en noche/amanecer/atardecer).
 // Se agrupan en 3 "capas" de profundidad 
@@ -83,6 +94,12 @@ const stars      = generateStars(160);
 const cloudsFar  = generateClouds(7,  3, 45, 140, 260,  90, 140);
 const cloudsMid  = generateClouds(6, 30, 68,  80, 160,  60,  95);
 const cloudsNear = generateClouds(8, 55, 96,  45, 110,  35,  65);
+
+// Subsets reducidos para móvil: menos estrellas, sin la capa "near" de nubes,
+// y solo 4/3 nubes en las capas far/mid en vez de 7/6
+const starsMobile     = stars.filter(s => s.layer !== "far" || s.id % 2 === 0).slice(0, 70);
+const cloudsFarMobile = cloudsFar.slice(0, 4);
+const cloudsMidMobile = cloudsMid.slice(0, 3);
 
 // Franja difuminada diagonal que simula la Vía Láctea — solo en modo noche.
 function MilkyWay() {
@@ -147,11 +164,17 @@ export default function App() {
     // la página principal o la sección (sobre mi)
     const [modeKey, setModeKey] = useState(getInitialMode);
     const [section, setSection] = useState("hero");
+    const isMobile = useIsMobile();
 
     const sky     = SKY_MODES[modeKey];
     const isNight = sky.label === "noche";
     const isDark  = sky.label === "noche" || sky.label === "atardecer" || sky.label === "amanecer";
     const isDaytime = sky.label === "mediodia";
+
+    // Datasets según dispositivo — móvil usa versiones reducidas
+    const activeStars     = isMobile ? starsMobile     : stars;
+    const activeCloudsFar = isMobile ? cloudsFarMobile : cloudsFar;
+    const activeCloudsMid = isMobile ? cloudsMidMobile : cloudsMid;
 
     // Renderiza una capa de nubes. No se muestran en modo noche.
     // Cada nube recorre la pantalla de izquierda a derecha en bucle infinito.
@@ -230,7 +253,7 @@ export default function App() {
                 {/* Nubes — 3 capas de profundidad, ocultas en modo noche (ver renderClouds) */}
                 {renderClouds(cloudsFar,  9, 2, 0.85)}
                 {renderClouds(cloudsMid,  7, 3, 0.95)}
-                {renderClouds(cloudsNear, 5, 4, 0.75)}
+                {!isMobile && renderClouds(cloudsNear, 5, 4, 0.75)}
             </div>
 
             {/* CONTENIDO */}
