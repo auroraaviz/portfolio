@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTheme } from "../theme";
 
+//array con todos los datos de contacto
 const contactLinks = [
     { glyph: "✦", label: "Email",    value: "auroraavilaizquierdo@gmail.com", href: "mailto:auroraavilaizquierdo@gmail.com", color: "#6366f1" },
     { glyph: "✦", label: "LinkedIn", value: "aurora-avila-dev",               href: "https://linkedin.com/in/aurora-avila-dev", color: "#6366f1" },
@@ -9,12 +10,14 @@ const contactLinks = [
     { glyph: "✦", label: "Teléfono", value: "627 355 118",                    href: "tel:+34627355118", color: "#6366f1"},
 ];
 
+//array que almacena la posición de cada apartado
 const STAR_ANCHORS = [
     { x: 7,  y: 30 },  // tarjeta 0 (Email)    — fila superior izq
     { x: 57, y: 30 },  // tarjeta 1 (LinkedIn) — fila superior dcha
     { x: 7,  y: 70 },  // tarjeta 2 (GitHub)   — fila inferior izq
     { x: 57, y: 70 },  // tarjeta 3 (Teléfono) — fila inferior dcha
 ];
+
 // Conexiones entre tarjetas — forman una constelación de cuatro estrellas
 const STAR_LINES = [[0,1],[0,2],[1,3],[2,3],[0,3]];
 
@@ -29,6 +32,7 @@ export default function Contacto({ sky = {} }) {
         ? "rgba(196,165,253,0.22)"
         : theme.lineCoreSoft || "rgba(99,102,241,0.18)";
 
+        //contenedor principal de la sección de contacto
     return (
         <section id="contacto" style={{
             position: "relative", width: "100%",
@@ -40,7 +44,6 @@ export default function Contacto({ sky = {} }) {
             <div style={{ maxWidth: 720, margin: "0 auto", position: "relative" }}>
 
                 {/* ── Constelación de fondo ── */}
-                {/* SVG absoluto sobre el área del grid; z-index 0 para que quede detrás */}
                 <svg
                     aria-hidden="true"
                     style={{

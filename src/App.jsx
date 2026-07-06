@@ -6,6 +6,8 @@ import SobreMi     from './components/SobreMi'
 import Habilidades from './components/Habilidades'
 import Contacto    from './components/Contacto'
 
+// Los 4 "modos de cielo" que controlan la paleta de fondo animado en toda la web.
+// para decidir colores y sombras según el momento del día.
 const SKY_MODES = {
     amanecer:  { top: "#0f051d", mid: "#4a1a6b", bottom: "#f472b6", label: "amanecer",  swatch: ["#0f051d", "#4a1a6b", "#f472b6"], icon: "🌅" },
     mediodia:  { top: "#7c3aed", mid: "#c4b5fd", bottom: "#a7f3d0", label: "mediodia",  swatch: ["#7c3aed", "#c4b5fd", "#a7f3d0"], icon: "☀️" },
@@ -14,6 +16,7 @@ const SKY_MODES = {
 };
 const MODE_KEYS = ["amanecer", "mediodia", "atardecer", "noche"];
 
+// Al cargar la página, elige el modo de cielo según la hora real del visitante.
 const getInitialMode = () => {
     const hour = typeof window !== "undefined" ? new Date().getHours() : 14;
     if (hour >= 5  && hour < 10) return "amanecer";
@@ -22,6 +25,8 @@ const getInitialMode = () => {
     return "noche";
 };
 
+// Genera el campo de estrellas de fondo (solo visible en noche/amanecer/atardecer).
+// Se agrupan en 3 "capas" de profundidad 
 const generateStars = (count) =>
     Array.from({ length: count }, (_, i) => {
         const roll = Math.random();
@@ -45,6 +50,9 @@ const generateStars = (count) =>
         };
     });
 
+// Construye los "blobs" que forman una nube individual.
+// El blob 0 siempre es la base, el resto se distribuye
+// en abanico alrededor para dar forma irregular
 const makeBlobs = (base, seedOffset = 0) => {
     const count = Math.floor(Math.random() * 4) + 4;
     return Array.from({ length: count }, (_, i) => {
@@ -61,6 +69,7 @@ const makeBlobs = (base, seedOffset = 0) => {
     });
 };
 
+// Genera un set de nubes para una franja de altura (yMin-yMax) con tamaño y velocidad variables
 const generateClouds = (count, yMin, yMax, sizeMin, sizeMax, speedMin, speedMax) =>
     Array.from({ length: count }, (_, i) => {
         const base     = Math.random() * (sizeMax - sizeMin) + sizeMin;
@@ -68,17 +77,21 @@ const generateClouds = (count, yMin, yMax, sizeMin, sizeMax, speedMin, speedMax)
         return { y: Math.random() * (yMax - yMin) + yMin, base, blobs: makeBlobs(base, i * 0.7), duration, delay: -(Math.random() * duration), opacity: Math.random() * 0.22 + 0.52 };
     });
 
+// Se generan una sola vez al cargar el módulo (no en cada render) para que las estrellas
+// y nubes no cambien de posición cada vez que React vuelve a renderizar    
 const stars      = generateStars(160);
 const cloudsFar  = generateClouds(7,  3, 45, 140, 260,  90, 140);
 const cloudsMid  = generateClouds(6, 30, 68,  80, 160,  60,  95);
 const cloudsNear = generateClouds(8, 55, 96,  45, 110,  35,  65);
 
+// Franja difuminada diagonal que simula la Vía Láctea — solo en modo noche.
 function MilkyWay() {
     return (
         <div style={{ position:"absolute", top:"10%", left:"-10%", width:"120%", height:"45%", background:"linear-gradient(105deg,transparent 20%,rgba(139,92,246,0.06) 40%,rgba(167,139,250,0.1) 52%,rgba(109,40,217,0.07) 64%,transparent 80%)", transform:"rotate(-18deg)", pointerEvents:"none", zIndex:1, filter:"blur(18px)" }} />
     );
 }
 
+// Manchas de color difuminadas (nebulosas) — solo visibles en modo noche, dan profundidad extra
 function Nebulae() {
     return (
         <>
@@ -89,6 +102,7 @@ function Nebulae() {
     );
 }
 
+// Botón flotante que permite seleccionar el modo de cielo
 function SkySelector({ currentMode, onSelect }) {
     const [expanded, setExpanded] = useState(false);
     return (
@@ -129,6 +143,8 @@ function SkySelector({ currentMode, onSelect }) {
 }
 
 export default function App() {
+    // `modeKey` es el modo de cielo activo; `section` controla si se muestra
+    // la página principal o la sección (sobre mi)
     const [modeKey, setModeKey] = useState(getInitialMode);
     const [section, setSection] = useState("hero");
 
@@ -137,6 +153,8 @@ export default function App() {
     const isDark  = sky.label === "noche" || sky.label === "atardecer" || sky.label === "amanecer";
     const isDaytime = sky.label === "mediodia";
 
+    // Renderiza una capa de nubes. No se muestran en modo noche.
+    // Cada nube recorre la pantalla de izquierda a derecha en bucle infinito.
     const renderClouds = (list, blurBase, zIdx, opacityMult = 1) => {
         if (isNight) return null;
         return list.map((cloud, i) => {
@@ -167,10 +185,12 @@ export default function App() {
                 {isNight && <MilkyWay />}
                 {isNight && <Nebulae />}
 
+                 {/* Sol — visible solo en mediodía */}
                 <motion.div initial={false} animate={{ opacity:isDaytime?1:0, scale:isDaytime?[1,1.04,1]:0.8 }}
                     transition={{ opacity:{duration:1.5}, scale:isDaytime?{duration:8,repeat:Infinity,ease:"easeInOut"}:{duration:1.5} }}
                     style={{ position:"absolute", top:"8%", right:"11%", width:56, height:56, borderRadius:"50%", background:"radial-gradient(circle at 40% 35%,#ffe4f0,#f9a8d4)", boxShadow:"0 0 60px 25px rgba(249,168,212,0.45),0 0 120px 50px rgba(167,139,250,0.2)", zIndex:2, pointerEvents:"none" }} />
 
+                {/* Luna con cráteres — visible en amanecer/atardecer/noche */}
                 <motion.div initial={false} animate={{ opacity:!isDaytime?1:0, scale:!isDaytime?[1,1.03,1]:0.8 }}
                     transition={{ opacity:{duration:1.5}, scale:!isDaytime?{duration:9,repeat:Infinity,ease:"easeInOut"}:{duration:1.5} }}
                     style={{ position:"absolute", top:"9%", right:"12%", width:44, height:44, borderRadius:"50%", background:"radial-gradient(circle at 32% 28%,#f5efff,#c4b5fd)", boxShadow:"0 0 40px 16px rgba(167,139,250,0.35),0 0 80px 30px rgba(109,40,217,0.15)", zIndex:2, overflow:"hidden", pointerEvents:"none" }}>
@@ -180,11 +200,14 @@ export default function App() {
                     <div style={{ position:"absolute", width:"8%",  height:"8%",  borderRadius:"50%", background:"rgba(139,92,246,0.12)", top:"68%", left:"28%" }} />
                 </motion.div>
 
+                {/* Halo suave alrededor de la luna */}
                 {!isDaytime && (
                     <motion.div initial={{ opacity:0 }} animate={{ opacity:0.5 }} transition={{ duration:2 }}
                         style={{ position:"absolute", top:"4%", right:"7%", width:120, height:120, borderRadius:"50%", background:"radial-gradient(circle,rgba(196,165,253,0.12) 0%,transparent 70%)", filter:"blur(8px)", zIndex:1, pointerEvents:"none" }} />
                 )}
 
+                {/* Campo de estrellas — visible en noche/amanecer/atardecer.
+                    En amanecer/atardecer se muestran menos estrellas */}
                 {(sky.label==="noche"||sky.label==="amanecer"||sky.label==="atardecer") &&
                     stars.map(star => {
                         const modeMult = sky.label==="noche"?1:sky.label==="atardecer"?0.35:0.2;
@@ -204,6 +227,7 @@ export default function App() {
                     })
                 }
 
+                {/* Nubes — 3 capas de profundidad, ocultas en modo noche (ver renderClouds) */}
                 {renderClouds(cloudsFar,  9, 2, 0.85)}
                 {renderClouds(cloudsMid,  7, 3, 0.95)}
                 {renderClouds(cloudsNear, 5, 4, 0.75)}

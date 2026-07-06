@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTheme } from "../theme";
 
+// Cada grupo es una "constelación" independiente dentro de su propia tarjeta
 const grupos = [
     {
         categoria: "Frontend Development", glyph: "✦", color: "#6366f1",
@@ -46,6 +47,7 @@ const grupos = [
     },
 ];
 
+// Estrella fugaz decorativa dentro de cada tarjeta de categoría 
 function ShootingStar({ color }) {
     const [visible, setVisible] = useState(false);
     const [pos, setPos] = useState({ x: 0, y: 0, angle: 0 });
@@ -101,6 +103,7 @@ function tooltipPosition(x, y) {
     return { vertical, horizontal };
 }
 
+// Una tarjeta = una categoría de skills, con su propio canvas y constelación interna
 function ConstellationGroup({ grupo, gi, currentMode }) {
     const [hoveredStar, setHoveredStar] = useState(null);
 
@@ -136,6 +139,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                     textShadow: isNight ? `0 0 14px ${grupo.color}` : "none",
                 }}>{grupo.glyph}</span>
 
+                {/* textShadow por modo: se refuerza con sombra oscura o glow según el caso. */}
                 <span style={{
                     fontFamily: "'Poppins', sans-serif", fontSize: "1rem", fontWeight: 700,
                     color: theme.headerText, letterSpacing: "0.8px",
@@ -180,7 +184,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
             >
                 {isNight && <ShootingStar color={grupo.color} />}
 
-                {/* Líneas SVG */}
+                {/* Líneas de conexión entre skills de esta categoria */}
                 <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none", zIndex: 1 }}>
                     <defs>
                         <filter id={`glow-${gi}`} x="-20%" y="-20%" width="140%" height="140%">
@@ -215,7 +219,7 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                     })}
                 </svg>
 
-                {/* Estrellas */}
+                {/* Estrellas (una por skill) */}
                 {grupo.skills.map((skill, si) => {
                     const isHovered = hoveredStar === si;
                     const { vertical, horizontal } = tooltipPosition(skill.x, skill.y);
@@ -225,9 +229,6 @@ function ConstellationGroup({ grupo, gi, currentMode }) {
                     const tipBottom = vertical === "top"    ? "calc(100% + 14px)" : "auto";
 
                     // Posición horizontal del tooltip
-                    // "center" → centrado sobre el nodo (transform -50%)
-                    // "left"   → anclado a la izquierda del nodo, no se sale por la izquierda
-                    // "right"  → anclado a la derecha del nodo, no se sale por la derecha
                     const tipStyle = (() => {
                         if (horizontal === "left")  return { left: 0,    transform: "none" };
                         if (horizontal === "right") return { right: 0,   transform: "none", left: "auto" };

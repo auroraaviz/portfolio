@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
+// Color de acento que cambia según el modo de cielo activo.
 const SKY_ACCENTS = {
     amanecer:  "#f9a8d4",
     mediodia:  "#a5b4fc",
@@ -12,15 +13,20 @@ export default function Hero({ sky = {}, onNameClick }) {
     const [hoverBtn, setHoverBtn]   = useState(false);
     const [scrolled, setScrolled]   = useState(false);
     const [hoverName, setHoverName] = useState(false);
+    //clicked: animación de desvanecer del nombre antes de ir a sobremi
     const [clicked, setClicked]     = useState(false);
     const accent = SKY_ACCENTS[sky?.label] || SKY_ACCENTS.noche;
 
+    // Oculta el indicador de scroll en cuanto se empieza a bajar.
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 60);
         window.addEventListener("scroll", onScroll, { passive: true });
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
+    // Al pulsar el nombre: dispara la animación de salida y va sobre mi
+    // El segundo setTimeout solo resetea el
+    // estado `clicked` por si el usuario vuelve atrás rápido.
     const handleNameClick = () => {
         if (clicked) return;
         setClicked(true);
@@ -48,11 +54,16 @@ export default function Hero({ sky = {}, onNameClick }) {
                     Desarrollo Web
                 </motion.p>
 
+                {/* El gradiente se aplica en un <span> interno para evitar un bug de compositing en Chromium
+                al combinar `filter` animado con `background-clip: text`. */}
                 <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={clicked
                         ? { opacity: 0, scale: 1.18, filter: "blur(12px)" }
                         : { opacity: 1, y: 0, scale: hoverName ? 1.035 : 1,
+                            // El filter se construye como array→join 
+                            // evita errores de sintaxis, evita bugs silenciosos
+                            // y hace el codigo mas fácil de entender.
                             filter: hoverName
                                 ? [
                                     "blur(0px)",
@@ -86,10 +97,12 @@ export default function Hero({ sky = {}, onNameClick }) {
                 >
                     <span style={{
                         display: "inline-block",
+                        //uso background image para evitar que react sobreescriba propiedades y cause parpadeos o glitches.
                         backgroundImage: `linear-gradient(135deg, #ffffff 55%, ${accent} 130%)`,
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         backgroundClip: "text",
+                        //forzamos a span a su propia capa para aislarlo de las animaciones del padre 
                         transform: "translateZ(0)",
                         willChange: "transform",
                         isolation: "isolate",
@@ -169,6 +182,7 @@ export default function Hero({ sky = {}, onNameClick }) {
                 </motion.div>
             </div>
 
+             {/* Indicador de scroll, oculto al bajar o al pulsar el nombre (clicked) */}           
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: scrolled || clicked ? 0 : 1 }}

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTheme } from "../theme";
 
+// se usan dos sistemas diferentes de coordenadas para movil y desktop
 const projects = [
     {
         id: 0, number: "01", name: "Turistea",
@@ -70,8 +71,10 @@ const projects = [
     },
 ];
 
+//pares de indices que se conectan a través de líneas 
 const constellationLines = [[0,1],[1,2],[2,4],[0,3],[3,4],[1,3],[3,5],[5,6],[4,6]];
 
+//colores de las pills del stack variable según el modo de día
 const stackColorsLight = {
     "PHP":        { bg:"rgba(109,40,217,0.18)", border:"rgba(139,92,246,0.5)",  text:"rgba(55,8,130,0.95)" },
     "MySQL":      { bg:"rgba(29,78,216,0.14)",  border:"rgba(59,130,246,0.45)", text:"rgba(10,38,130,0.95)" },
@@ -94,6 +97,8 @@ function useIsMobile() {
     return v;
 }
 
+//estrella fugaz decorativa, aparece de forma aleatoria cada pocos segundos, 
+//a veces puede no aparecer.
 function ShootingStar({ color }) {
     const [visible, setVisible] = useState(false);
     const [pos, setPos] = useState({ x:0, y:0, angle:0 });
@@ -127,6 +132,7 @@ function ShootingStar({ color }) {
     );
 }
 
+//Pastilla de tecnología dentro del panel
 function StackPill({ tech, dark }) {
     const c = stackColorsLight[tech] || { bg:"rgba(109,40,217,0.12)", border:"rgba(139,92,246,0.4)", text:"rgba(55,8,130,0.9)" };
     if (dark) {
@@ -146,6 +152,7 @@ function StackPill({ tech, dark }) {
     );
 }
 
+//Contenido del panel de detalle, se usa en el panel flotante y en el bloque fijo del movil
 function ProjectContent({ project, theme }) {
     const numberColor = theme.dark ? "rgba(196,165,253,0.65)" : theme.tagColor;
     const nameColor   = theme.dark ? "#fff" : "rgba(20,10,45,0.95)";
@@ -253,6 +260,8 @@ function DesktopConstellation({ projects, theme }) {
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+                        {/* Tooltip nombre + tag, visible en hover */}
                         <AnimatePresence>
                             {isHover&&!isOpen&&(
                                 <motion.div initial={{opacity:0,y:5}} animate={{opacity:1,y:0}} exit={{opacity:0,y:2}}
@@ -262,6 +271,7 @@ function DesktopConstellation({ projects, theme }) {
                                 </motion.div>
                             )}
                         </AnimatePresence>
+                        {/* Panel de detalle, siempre anclado arriba del punto */}
                         <AnimatePresence>
                             {isOpen&&(
                                 <motion.div initial={{opacity:0,scale:0.88,y:10}} animate={{opacity:1,scale:1,y:0}} exit={{opacity:0,scale:0.88,y:5}}
@@ -322,6 +332,7 @@ function MobileConstellation({ projects, theme }) {
                     </svg>
                     {projects.map(project => {
                         const isOpen=openId===project.id, isHover=hoverId===project.id, sz=isOpen||isHover?16:9;
+                        //se ajusta la alineación según los bordes del canvas para evitar que se corte
                         const hAnchor = project.mobileStarX < 28 ? "left" : project.mobileStarX > 72 ? "right" : "center";
                         const hStyle = hAnchor === "left"
                             ? { left: 0, right: "auto", transform: "none", textAlign: "left" }
@@ -364,6 +375,8 @@ function MobileConstellation({ projects, theme }) {
                     })}
                 </div>
             </div>
+
+            {/* Panel de detalle en móvil — bloque fijo bajo el canvas*/}
             <AnimatePresence>
                 {openProject&&(
                     <motion.div key={openProject.id} initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} exit={{opacity:0,y:10}} transition={{duration:0.3,ease:"easeOut"}}
@@ -395,7 +408,9 @@ export default function Projects({ sky = {}, isNight: isNightProp = false }) {
                 <h2 style={{
                     fontFamily:"'Poppins',sans-serif",
                     fontSize:"clamp(1.8rem,4vw,2.0rem)",
-                    fontWeight:700, margin:0, letterSpacing:"clamp(4px, 2vw, 20px)", textTransform:"uppercase",
+                    fontWeight:700, margin:0, 
+                    //uso de clamp para mantener el efecto amplio en desktop pero reducir en pantallas pequeñas
+                    letterSpacing:"clamp(4px, 2vw, 20px)", textTransform:"uppercase",
                 }}>
                     <span key={currentMode} style={{
                         background: theme.titleGradient,

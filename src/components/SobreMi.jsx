@@ -38,8 +38,10 @@ function useIsMobile() {
     return v;
 }
 
+//lineas que conectan las constelaciones por grupos de dos
 const CONSTELLATION_LINES = [[0,1],[1,2],[2,3],[3,4],[4,0],[1,3]];
 
+//bloque de texto con diferentes modos de color según el dia.
 function AboutText({ currentMode, isBright }) {
     const isNight = currentMode === "noche";
 
@@ -106,6 +108,8 @@ function AboutText({ currentMode, isBright }) {
     );
 }
 
+// Variación sutil del halo pulsante por estrella
+// para que las 4 sean diferentes
 const HALO_AMPLITUDES = [1.22, 1.32, 1.16, 1.26];
 
 function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, isMobile, currentMode, index }) {
@@ -123,6 +127,9 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
         : `0 0 6px 2px ${highlight.color}55,0 0 14px 4px ${highlight.color}22`;
     const haloOpacity = isNight ? [0.12,0.38,0.12] : [0.08,0.28,0.08];
 
+    // El panel de info se ancla al lado con más espacio: si la estrella está
+    // en la mitad izquierda, el panel se abre hacia la derecha (y viceversa);
+    // Esto evita que el panel se salga de pantalla en los bordes.
     const anchorLeft  = pos.x < 50;
     const anchorBelow = pos.y < 50;
 
@@ -131,6 +138,8 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
     const panelBottom = anchorBelow ? "auto" : "calc(100% + 14px)";
     const panelTop    = anchorBelow ? "calc(100% + 14px)" : "auto";
 
+    //isNight se usa como único para el color del texto porque
+    //solo el modo noche cambia realmente el requisito de contraste.
     const panelBg     = theme.panelBg;
     const labelClr    = isNight ? "#fff" : "rgba(20,4,70,0.95)";
     const descClr     = isNight ? "rgba(220,200,255,0.82)" : "rgba(45,8,100,0.78)";
@@ -138,13 +147,13 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
 
     return (
         <div style={{ position:"absolute", left:`${pos.x}%`, top:`${pos.y}%`, transform:"translate(-50%,-50%)", zIndex: isOpen ? 40 : 10 }}>
-            {/* Halo */}
+            {/* Halo de la estrella */}
             <motion.div
                 animate={{ opacity: haloOpacity, scale:[0.88, haloAmp, 0.88] }}
                 transition={{ duration:3.2+delay, repeat:Infinity, ease:"easeInOut" }}
                 style={{ position:"absolute", top:"50%", left:"50%", width:48, height:48, transform:"translate(-50%,-50%)", borderRadius:"50%", background:`radial-gradient(circle,${highlight.color}50 0%,transparent 70%)`, pointerEvents:"none" }}
             />
-            {/* Estrella */}
+            {/* Estrella clicable*/}
             <motion.div
                 animate={{ scale:[1,1.2,1], opacity:[0.82,1,0.82] }}
                 transition={{ duration:2.6+delay*0.4, repeat:Infinity, ease:"easeInOut" }}
@@ -174,7 +183,7 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
                     </motion.div>
                 )}
             </AnimatePresence>
-            {/* Panel info — tarjeta con identidad de color fuerte */}
+            {/* Panel de detalle — se abre al hacer click en la estrella */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -195,7 +204,7 @@ function ConstellationStar({ highlight, pos, delay, isOpen, onToggle, isNight, i
                         }}
                     >
 
-                        {/* Botón cerrar — círculo real */}
+                        {/* Botón cerrar */}
                         <button
                             onClick={onToggle}
                             aria-label="Cerrar"
@@ -235,11 +244,14 @@ export default function SobreMi({ sky = {}, isNight: isNightProp = false, onBack
     const STAR_POSITIONS = isMobile ? STAR_POSITIONS_MOBILE : STAR_POSITIONS_DESKTOP;
     const lineDelays = [0, 0.25, 0.5, 0.75, 1.0, 1.25];
 
+    //sky como fuente principal del estado de tema y isNightProp como fallback para mantener 
+    //compatibilidad con versiones antiguas del componente sin romper el render.
     const currentMode = sky?.label || (isNightProp ? "noche" : "mediodia");
     const isNight  = currentMode === "noche";
     const isBright = currentMode === "amanecer" || currentMode === "atardecer";
 
     const lineHalo  = isNight ? "rgba(167,139,250,0.10)" : isBright ? "rgba(30,4,25,0.18)" : "rgba(80,40,180,0.12)";
+    //Usas una línea blanca con halo oscuro para garantizar legibilidad sobre un fondo variable
     const lineMain  = isNight ? "rgba(196,165,253,0.40)" : isBright ? "rgba(255,255,255,0.7)"  : "rgba(100,50,200,0.30)";
     const labelTop  = isNight ? "rgba(233,213,255,0.60)" : isBright ? "rgba(255,246,250,0.9)" : "rgba(30,5,80,0.55)";
     const backBg    = isNight ? "rgba(5,1,18,0.65)"      : "rgba(255,255,255,0.55)";
@@ -283,7 +295,7 @@ export default function SobreMi({ sky = {}, isNight: isNightProp = false, onBack
                     ← volver
                 </motion.button>
 
-                {/* Título "sobre mí" — clamp en top para no solaparse con el SkySelector en móvil */}
+                {/* Título sobre mí— clamp en top para no solaparse con el SkySelector en móvil */}
                 <motion.p
                     initial={{ opacity:0 }}
                     animate={{ opacity:1 }}
@@ -368,6 +380,7 @@ export default function SobreMi({ sky = {}, isNight: isNightProp = false, onBack
                         )}
                     </div>
 
+                    {/* Hint final*/}    
                     <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.2 }}
                         style={{
                             display: "inline-block",
