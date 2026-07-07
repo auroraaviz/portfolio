@@ -20,8 +20,32 @@ Un portfolio interactivo con un cielo animado que cambia según la hora del día
 ## 📸 Vista previa
 
 <div align="center">
-  <img src="./public/vercelapp.png" alt="Captura del portfolio de Aurora Ávila" width="800">
+  <img src="./public/screenshots/hero.png" alt="Sección Hero del portfolio" width="800">
+  <p><em>Pantalla de inicio — modo mediodía</em></p>
 </div>
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="./public/screenshots/proyectos.png" alt="Constelación de proyectos" width="100%">
+      <p align="center"><em>Constelación de proyectos</em></p>
+    </td>
+    <td width="50%">
+      <img src="./public/screenshots/habilidades.png" alt="Constelación de habilidades" width="100%">
+      <p align="center"><em>Habilidades técnicas</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="./public/screenshots/sobremi.png" alt="Sección Sobre mí en modo noche" width="100%">
+      <p align="center"><em>Sobre mí — modo noche</em></p>
+    </td>
+    <td width="50%">
+      <img src="./public/screenshots/contacto.png" alt="Sección de contacto" width="100%">
+      <p align="center"><em>Contacto</em></p>
+    </td>
+  </tr>
+</table>
 
 ---
 
