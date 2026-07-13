@@ -9,7 +9,7 @@ const projects = [
         description: "Agencia de viajes fullstack en equipo durante las prácticas en Zaitec. Diseño visual, branding y logotipo de autoría propia.",
         stack: ["PHP", "MySQL", "JavaScript", "Bootstrap"],
         github: "https://github.com/auroraaviz/turistea-agencia-viajes",
-        demo: null, tag: "Proyecto estrella",
+        demo: "https://turistea.infinityfreeapp.com", tag: "Demo en vivo",
         starX: 18, starY: 22,
         mobileStarX: 28, mobileStarY: 16,
     },
